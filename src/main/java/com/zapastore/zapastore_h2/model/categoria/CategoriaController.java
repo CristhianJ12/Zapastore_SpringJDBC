@@ -1,12 +1,10 @@
-package com.zapastore.zapastore_h2.model.categoria;
-
-import java.util.List;
+package com.zapastore.zapastore_h2.model.categoria; // Asumo que está en el paquete 'controller'
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 public class CategoriaController {
@@ -17,7 +15,7 @@ public class CategoriaController {
         this.categoriaService = categoriaService;
     }
 
-    // 🔹 Mostrar lista
+    // 🔹 Mostrar lista de categorías
     @GetMapping("/admin/categorias")
     public String listarCategorias(Model model,
                                    @RequestParam(value = "msg", required = false) String msg) {
@@ -25,6 +23,20 @@ public class CategoriaController {
         model.addAttribute("categorias", categorias);
         model.addAttribute("msg", msg);
         return "admin/categoriaLista";
+    }
+    
+    // 🔹 MOSTRAR FORMULARIO PARA EDITAR (Nueva Ruta GET)
+    @GetMapping("/admin/categorias/mostrarEditar")
+    public String mostrarFormularioEditar(@RequestParam("id") Integer id, Model model) {
+        Categoria categoria = categoriaService.buscarPorId(id);
+        
+        // Verifica si la categoría fue encontrada
+        if (categoria == null) {
+            return "redirect:/admin/categorias?msg=Categoría no encontrada para editar";
+        }
+        
+        model.addAttribute("categoria", categoria);
+        return "admin/categoriaEditar"; 
     }
 
     // 🔹 Registrar nueva categoría
@@ -35,7 +47,7 @@ public class CategoriaController {
             return "redirect:/admin/categorias?msg=El nombre no puede estar vacío";
         }
 
-        // Verifica si ya existe
+        // Verifica si ya existe (lógica simplificada)
         List<Categoria> existentes = categoriaService.listarCategorias();
         boolean existe = existentes.stream()
                 .anyMatch(c -> c.getNombre().equalsIgnoreCase(nombre.trim()));
@@ -51,17 +63,27 @@ public class CategoriaController {
         return "redirect:/admin/categorias?msg=Categoría registrada correctamente";
     }
 
-    // 🔹 Actualizar nombre o estado
-    @PostMapping("/admin/categorias/editar")
-    public String editarCategoria(@RequestParam("id") Integer id,
-                                  @RequestParam("nombre") String nombre,
-                                  @RequestParam("estado") String estado) {
+    // 🔹 ACTUALIZAR nombre o estado (Ruta POST que recibe los datos del formulario de edición)
+    @PostMapping("/admin/categorias/actualizar") // RUTA CORREGIDA
+    public String actualizarCategoria(
+        @RequestParam("categoriaId") Integer id,
+        @RequestParam("nombre") String nombre,
+        @RequestParam("estado") String estado,
+        Model model) {
+        
         if (nombre == null || nombre.trim().isEmpty()) {
-            return "redirect:/admin/categorias?msg=El nombre no puede estar vacío";
+            // Si hay un error, recarga la vista de edición para mostrar el mensaje
+            Categoria cError = categoriaService.buscarPorId(id);
+            model.addAttribute("categoria", cError);
+            model.addAttribute("msg", "El nombre no puede estar vacío.");
+            return "admin/categoriaEditar";
         }
 
-        Categoria c = new Categoria();
-        c.setCategoriaId(id);;
+        Categoria c = categoriaService.buscarPorId(id);
+        if (c == null) {
+            return "redirect:/admin/categorias?msg=Error: Categoría no encontrada para actualizar";
+        }
+        
         c.setNombre(nombre.trim());
         c.setEstado(estado);
         categoriaService.actualizar(c);

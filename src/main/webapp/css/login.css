@@ -1,0 +1,275 @@
+/* ===== VARIABLES PRINCIPALES ===== */
+:root {
+    --color-primary: #11d452;
+    --bg-main: #f6f8f6;
+    --bg-header-footer: rgba(246, 248, 246, 0.9);
+    --text-header: #1f2937;
+    --text-default: #4b5563;
+    --border-main: rgba(0, 0, 0, 0.1);
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+}
+
+/* ===== RESET ===== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Be Vietnam Pro', 'Noto Sans', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-default);
+    line-height: 1.5;
+}
+
+/* ===== HEADER ===== */
+.main-header {
+    background-color: var(--bg-header-footer);
+    backdrop-filter: blur(5px);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid var(--border-main);
+}
+
+.header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 4.5rem;
+    padding: 0 var(--space-4);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    text-decoration: none;
+    color: var(--text-header);
+}
+
+.logo-image {
+    height: 24px;
+}
+
+.logo-text {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
+.page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex-grow: 1;
+}
+
+/* ===== LOGIN ===== */
+.login-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 4.5rem);
+    padding: var(--space-4);
+}
+
+.login-form-container {
+    width: 100%;
+    max-width: 400px; /* Para que no ocupe todo el ancho */
+    padding: var(--space-8);
+    background-color: var(--bg-header-footer);
+    border: 1px solid var(--border-main);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+/* ===== REGISTRO ===== */
+.register-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 4.5rem);
+    padding: var(--space-4);
+}
+
+.register-form-container {
+    width: 100%;
+    max-width: 850px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background-color: var(--bg-header-footer);
+    border: 1px solid var(--border-main);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+}
+
+.form-box {
+    background-color: var(--bg-main);
+    padding: var(--space-8);
+    border-right: 1px solid var(--border-main);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.benefit-box {
+    background-color: var(--bg-header-footer);
+    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* ===== TITULOS ===== */
+.login-title,
+.section-title {
+    text-align: center;
+    margin-bottom: var(--space-6);
+    font-size: 2rem;
+    color: var(--text-header);
+}
+
+.benefit-title {
+    color: var(--color-primary);
+    font-size: 1.5rem;
+    margin-bottom: var(--space-6);
+}
+
+/* ===== LISTA BENEFICIOS ===== */
+.benefit-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.benefit-list li {
+    font-size: 1rem;
+    color: var(--text-default);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+/* ===== FORMULARIO ===== */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--text-header);
+    font-size: 0.9rem;
+}
+
+.form-input {
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-main);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3);
+    font-size: 1rem;
+    color: var(--text-header);
+    width: 100%;
+    transition: all 0.3s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+/* ===== BOTON ===== */
+.login-button {
+    margin-top: var(--space-6);
+    padding: var(--space-3);
+    width: 100%;
+    background-color: var(--color-primary);
+    color: #1f2937;
+    font-weight: 700;
+    border-radius: var(--radius-lg);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.login-button:hover {
+    background-color: #11d452d9;
+    transform: scale(1.02);
+}
+
+/* ===== ENLACES ===== */
+.signup-link {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-default);
+    margin-top: var(--space-4);
+}
+
+.color-primary-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.color-primary-link:hover {
+    color: var(--text-header);
+    text-decoration: underline;
+}
+
+/* ===== MENSAJES DE ERROR ===== */
+.error {
+    margin-top: var(--space-4);
+    color: #e74c3c;
+    background-color: #fdecea;
+    border: 1px solid #f5c2c0;
+    padding: var(--space-2);
+    text-align: center;
+    border-radius: 5px;
+}
+
+/* ===== RESPONSIVIDAD ===== */
+@media (max-width: 1024px) {
+    .register-form-container {
+        max-width: 700px;
+    }
+}
+
+@media (max-width: 768px) {
+    .register-form-container {
+        grid-template-columns: 1fr;
+    }
+    .form-box {
+        border-right: none;
+    }
+}

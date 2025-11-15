@@ -2,7 +2,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<c:set var="isEdit" value="${not empty producto.producto_ID}" />
+<%-- Definición de la variable isEdit para toda la lógica del formulario --%>
+<c:set var="isEdit" value="${producto.id > 0}" />
 
 <!DOCTYPE html>
 <html lang="es">
@@ -14,7 +15,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/adminStyles.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin.css">
 </head>
 
 <body class="admin-body">
@@ -42,8 +43,9 @@
                            action="${pageContext.request.contextPath}/admin/productos/guardar"
                            modelAttribute="producto">
 
-                    <c:if test="${isEdit}">
-                        <form:hidden path="producto_ID"/>
+                    <%-- Corrección 1: Usamos 'isEdit' y 'id' --%>
+                    <c:if test="${isEdit}"> 
+                        <form:hidden path="id"/>
                     </c:if>
 
                     <div class="form-grid">
@@ -52,17 +54,18 @@
                             <form:input path="nombre" id="nombre" placeholder="Ej. Nike Air Zoom" required="true"/>
                         </div>
 
-                        <!-- Selección de Categoría -->
+                        <%-- Selección de Categoría --%>
                         <div class="campo categoria-select">
-                            <label for="categoria_ID">Categoría</label>
+                            <label for="categoriaID">Categoría</label>
                             <div class="categoria-flex">
-                                <form:select path="categoria_ID" id="categoria_ID" required="true" class="select-control">
+                                <%-- Corrección 2: Usamos 'categoriaID' --%>
+                                <form:select path="categoriaID" id="categoriaID" required="true" class="select-control">
                                     <form:option value="" label="Seleccione una Categoría"/>
                                     <c:forEach var="cat" items="${categorias}">
-                                        <form:option value="${cat.categoria_ID}" label="${cat.nombre}"/>
+                                        <form:option value="${cat.categoriaId}" label="${cat.nombre}"/> 
                                     </c:forEach>
                                 </form:select>
-                                <a href="${pageContext.request.contextPath}/admin/categorias/lista"
+                                <a href="${pageContext.request.contextPath}/admin/categorias"
                                    class="secondary-button-admin small-btn">
                                     <span class="material-symbols-outlined">tune</span>
                                     Administrar categorías
@@ -76,8 +79,9 @@
                         </div>
 
                         <div class="campo campo-full">
-                            <label for="img_Url">Imagen del producto (URL)</label>
-                            <form:input path="img_Url" type="url" id="img_Url" placeholder="https://..." required="true"/>
+                            <label for="imagenUrl">Imagen del producto (URL)</label>
+                            <%-- Corrección 3: Usamos 'imagenUrl' --%>
+                            <form:input path="imagenUrl" type="url" id="imagenUrl" placeholder="https://..." required="true"/>
                         </div>
 
                         <div class="campo campo-full">

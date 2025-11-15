@@ -2,20 +2,20 @@ package com.zapastore.zapastore_h2.model.producto;
 
 public class Producto {
 
-    private int id;
+    private Integer id;
     private String nombre;
     private double precio;
     private String imagenUrl;
     private String descripcion;
     private String estado;
-    private int categoriaID;
+    private Integer categoriaID; // CORRECCIÓN: CAMBIADO de 'int' a 'Integer'
     private String categoriaNombre; // campo transitorio (JOIN con categoría)
 
     public Producto() {
     }
 
-    public Producto(int id, String nombre, double precio, String imagenUrl, String descripcion,
-                    String estado, int categoriaID, String categoriaNombre) {
+    public Producto(Integer id, String nombre, double precio, String imagenUrl, String descripcion,
+                    String estado, Integer categoriaID, String categoriaNombre) {
         this.id = id;
         this.nombre = nombre;
         this.precio = precio;
@@ -27,11 +27,11 @@ public class Producto {
     }
 
     // Getters y setters
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -75,11 +75,12 @@ public class Producto {
         this.estado = estado;
     }
 
-    public int getCategoriaID() {
+    // CORRECCIÓN en Getter y Setter
+    public Integer getCategoriaID() {
         return categoriaID;
     }
 
-    public void setCategoriaID(int categoriaID) {
+    public void setCategoriaID(Integer categoriaID) {
         this.categoriaID = categoriaID;
     }
 

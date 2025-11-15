@@ -2,6 +2,7 @@ package com.zapastore.zapastore_h2.model.producto;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -19,7 +20,7 @@ public class ProductoRepository {
 
     private final RowMapper<Producto> productoMapper = new RowMapper<>() {
         @Override
-        public Producto mapRow(ResultSet rs, int rowNum) throws SQLException {
+        public Producto mapRow(@NonNull ResultSet rs, int rowNum) throws SQLException {
             Producto p = new Producto();
             p.setId(rs.getInt("producto_ID"));
             p.setNombre(rs.getString("nombre"));

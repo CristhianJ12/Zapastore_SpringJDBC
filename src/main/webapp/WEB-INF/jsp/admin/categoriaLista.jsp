@@ -11,7 +11,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZapaStore | Administrar Categorías</title>
 
-    <!-- Fuentes y estilos -->
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin.css">
@@ -20,15 +19,12 @@
 <body class="admin-body">
 <div class="admin-layout">
 
-    <!-- Sidebar -->
     <jsp:include page="/WEB-INF/jsp/fragments/sidebar.jsp"/>
 
     <main class="main-panel">
 
-        <!-- Header -->
         <jsp:include page="/WEB-INF/jsp/fragments/header.jsp"/>
 
-        <!-- Contenido principal -->
         <div class="content-wrapper">
 
             <div class="page-header">
@@ -38,12 +34,10 @@
                 </h2>
             </div>
 
-            <!-- Mensajes -->
             <c:if test="${not empty msg}">
                 <div class="alert success">${msg}</div>
             </c:if>
 
-            <!-- Formulario: nueva categoría -->
             <section class="crud-area">
                 <form class="crud-form" action="${pageContext.request.contextPath}/admin/categorias/guardar" method="POST">
                     <div class="form-grid">
@@ -68,7 +62,6 @@
                     </div>
                 </form>
 
-                <!-- Tabla de categorías -->
                 <div class="crud-lista">
                     <table class="crud-table">
                         <thead>
@@ -90,17 +83,12 @@
                                     </span>
                                 </td>
                                 <td class="actions-cell">
-                                    <!-- Editar -->
-                                    <form action="${pageContext.request.contextPath}/admin/categorias/editar" method="post" class="d-inline">
-                                        <input type="hidden" name="id" value="${cat.categoriaId}">
-                                        <input type="hidden" name="nombre" value="${cat.nombre}">
-                                        <input type="hidden" name="estado" value="${cat.estado}">
-                                        <button class="icon-button edit" title="Editar">
-                                            <span class="material-symbols-outlined">edit</span>
-                                        </button>
-                                    </form>
+                                    <a href="${pageContext.request.contextPath}/admin/categorias/mostrarEditar?id=${cat.categoriaId}"
+                                       class="icon-button edit"
+                                       title="Editar">
+                                        <span class="material-symbols-outlined">edit</span>
+                                    </a>
 
-                                    <!-- Inactivar -->
                                     <c:if test="${cat.estado == 'Activo'}">
                                         <a href="${pageContext.request.contextPath}/admin/categorias/eliminar?id=${cat.categoriaId}"
                                            class="icon-button delete"
