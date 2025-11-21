@@ -17,7 +17,7 @@
         <div class="container header-inner">
             <div class="header-left">
                 <a class="logo" href="<c:url value='/'/>">
-                    <img src="<c:url value='/resources/img/logo.png'/>" alt="Logo ZapaStore" class="logo-image" height="24">
+                    <img src="${pageContext.request.contextPath}/img/logo.png" alt="Logo ZapaStore" class="logo-image" height="24">
                     <h1 class="logo-text">ZapaStore</h1>
                 </a>
             </div>

@@ -126,4 +126,19 @@ public class ProductoRepository implements ProductoDAO {
 
         return ids.stream().anyMatch(id -> !Objects.equals(id, excluirId));
     }
+
+    @Override
+    public List<Producto> buscarPorCategoria(Integer categoriaId) {
+        String sql = """
+        SELECT p.producto_ID, p.nombre, p.Precio, p.img_Url,
+               p.descripcion, p.estado, p.categoria_ID,
+               c.nombre AS categoria_nombre
+        FROM productos p
+        LEFT JOIN categorias c ON p.categoria_ID = c.categoria_ID
+        WHERE p.categoria_ID = ?
+        ORDER BY p.producto_ID ASC
+    """;
+        return jdbcTemplate.query(sql, mapper, categoriaId);
+    }
+
 }

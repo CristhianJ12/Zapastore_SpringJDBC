@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.zapastore.zapastore_h2.model.usuarios.Usuario;
@@ -18,80 +19,76 @@ public class AuthController {
     @Autowired
     private UsuarioDAO usuarioDao;
 
-    // ======================================
-    // Muestra formulario de LOGIN
-    // ======================================
+    // ===============================
+    // LOGIN
+    // ===============================
     @GetMapping("/login")
     public String showLogin(Model model) {
-        return "admin/login";
+        return "login"; // Asegúrate que tu JSP sea login.jsp
     }
 
-    // ======================================
-    // Procesa el LOGIN (versión corregida opción B)
-    // ======================================
     @PostMapping("/login")
-    public String login(String correo, String contrasena, HttpSession session, Model model) {
+    public String login(@RequestParam("correo") String correo,
+                        @RequestParam("contrasena") String contrasena,
+                        HttpSession session, Model model) {
 
-        // Buscar usuario solo por correo
         Usuario usuario = usuarioDao.findByCorreo(correo).orElse(null);
 
-        if (usuario != null) {
+        if (usuario != null && usuario.getContrasena() != null &&
+                usuario.getContrasena().equals(contrasena)) {
 
-            // Comparar contraseña manualmente
-            if (usuario.getContrasena() != null && usuario.getContrasena().equals(contrasena)) {
+            session.setAttribute("usuarioSesion", usuario);
 
-                // Guardar usuario en sesión
-                session.setAttribute("usuarioSesion", usuario);
-
-                if ("admin".equalsIgnoreCase(usuario.getRol())) {
-                    return "redirect:/admin/metricas";
-                } else if ("cliente".equalsIgnoreCase(usuario.getRol())) {
-                    return "redirect:/cliente/perfil";
-                }
+            if ("admin".equalsIgnoreCase(usuario.getRol())) {
+                return "redirect:/admin/metricas";
+            } else if ("cliente".equalsIgnoreCase(usuario.getRol())) {
+                return "redirect:/cliente/perfil";
             }
         }
 
-        // Si falla la autenticación
         model.addAttribute("error", "Credenciales incorrectas o usuario inactivo.");
         model.addAttribute("usuario", new Usuario());
-        return "admin/login";
+        return "login";
     }
 
-    // ======================================
-    // Cierre de sesión
-    // ======================================
+    // ===============================
+    // LOGOUT
+    // ===============================
     @GetMapping("/logout")
     public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
         session.invalidate();
-        redirectAttributes.addAttribute("logout", "success");
+        redirectAttributes.addFlashAttribute("msg", "Sesión cerrada correctamente.");
         return "redirect:/login";
     }
 
-    // ======================================
-    // Muestra formulario de REGISTRO
-    // ======================================
+    // ===============================
+    // REGISTRO
+    // ===============================
     @GetMapping("/registrar")
     public String showRegister(Model model) {
         model.addAttribute("usuario", new Usuario());
-        return "admin/registrar";
+        return "registrar"; // Asegúrate que tu JSP sea registrar.jsp
     }
 
-    // ======================================
-    // Procesa el REGISTRO (Cliente)
-    // ======================================
-    @PostMapping("/register")
-    public String register(@ModelAttribute("usuario") Usuario usuario, String confirmPassword,
-                           RedirectAttributes redirectAttributes, Model model) {
+    @PostMapping("/registro")
+    public String register(@ModelAttribute("usuario") Usuario usuario,
+                           @RequestParam("confirmarContrasena") String confirmPassword,
+                           RedirectAttributes redirectAttributes,
+                           Model model) {
 
         if (!usuario.getContrasena().equals(confirmPassword)) {
             model.addAttribute("error", "Las contraseñas no coinciden.");
-            return "admin/registrar";
+            return "registrar";
         }
 
         if (usuarioDao.existsByCorreo(usuario.getCorreo())) {
             model.addAttribute("error", "El correo electrónico ya está registrado.");
-            return "admin/registrar";
+            return "registrar";
         }
+
+        // Por defecto, rol cliente y activo
+        usuario.setRol("cliente");
+        usuario.setEstado("Activo");
 
         usuarioDao.save(usuario);
 

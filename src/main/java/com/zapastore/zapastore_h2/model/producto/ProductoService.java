@@ -10,6 +10,8 @@ public interface ProductoService {
     void desactivarProducto(int id);
     List<Producto> buscarPorNombre(String nombre);
 
-    // Validación de nombre repetido
+    // Nuevo método
+    List<Producto> buscarPorCategoria(Integer categoriaId);
+
     boolean existeNombre(String nombre, Integer excluirId);
 }

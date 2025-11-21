@@ -25,31 +25,24 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     public void guardarProducto(Producto p) {
-
         if (p.getNombre() == null || p.getNombre().trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre del producto es obligatorio.");
         }
-
         if (productoDAO.existeNombre(p.getNombre(), null)) {
             throw new IllegalArgumentException("Ya existe un producto con ese nombre.");
         }
-
-        p.setEstado("Activo");  // estado por defecto
-
+        p.setEstado("Activo");
         productoDAO.guardar(p);
     }
 
     @Override
     public void actualizarProducto(Producto p) {
-
         if (p.getNombre() == null || p.getNombre().trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre del producto es obligatorio.");
         }
-
         if (productoDAO.existeNombre(p.getNombre(), p.getId())) {
             throw new IllegalArgumentException("Ya existe otro producto con ese nombre.");
         }
-
         productoDAO.actualizar(p);
     }
 
@@ -66,5 +59,13 @@ public class ProductoServiceImpl implements ProductoService {
     @Override
     public boolean existeNombre(String nombre, Integer excluirId) {
         return productoDAO.existeNombre(nombre, excluirId);
+    }
+
+    @Override
+    public List<Producto> buscarPorCategoria(Integer categoriaId) {
+        if (categoriaId == null) {
+            return productoDAO.listarProductos();
+        }
+        return productoDAO.buscarPorCategoria(categoriaId);
     }
 }
