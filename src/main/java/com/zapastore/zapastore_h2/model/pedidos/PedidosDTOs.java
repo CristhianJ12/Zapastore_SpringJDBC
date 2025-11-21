@@ -1,4 +1,4 @@
-package com.zapastore.zapastore_h2.model.pedidos.dto;
+package com.zapastore.zapastore_h2.model.pedidos;
 
 import java.math.BigDecimal;
 

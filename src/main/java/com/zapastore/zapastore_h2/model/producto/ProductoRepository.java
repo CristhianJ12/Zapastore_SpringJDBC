@@ -25,7 +25,7 @@ public class ProductoRepository implements ProductoDAO {
             Producto p = new Producto();
             p.setId(rs.getInt("producto_ID"));
             p.setNombre(rs.getString("nombre"));
-            p.setPrecio(rs.getDouble("Precio"));
+            p.setPrecio(rs.getBigDecimal("Precio"));
             p.setImagenUrl(rs.getString("img_Url"));
             p.setDescripcion(rs.getString("descripcion"));
             p.setEstado(rs.getString("estado"));

@@ -42,7 +42,7 @@ public class AuthController {
             if ("admin".equalsIgnoreCase(usuario.getRol())) {
                 return "redirect:/admin/metricas";
             } else if ("cliente".equalsIgnoreCase(usuario.getRol())) {
-                return "redirect:/cliente/perfil";
+                return "redirect:/cliente/home";
             }
         }
 

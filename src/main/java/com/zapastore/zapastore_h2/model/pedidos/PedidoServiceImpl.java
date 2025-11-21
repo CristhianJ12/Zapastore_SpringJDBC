@@ -12,7 +12,6 @@ public class PedidoServiceImpl implements PedidoService {
 
     private final PedidoDAO pedidoDAO;
 
-    @Autowired
     public PedidoServiceImpl(PedidoDAO pedidoDAO) {
         this.pedidoDAO = pedidoDAO;
     }

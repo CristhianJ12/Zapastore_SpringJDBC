@@ -1,21 +1,25 @@
 package com.zapastore.zapastore_h2.model.producto;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 public class Producto {
 
     private Integer id;
     private String nombre;
-    private double precio;
+    private BigDecimal precio;
     private String imagenUrl;
     private String descripcion;
     private String estado;
     private Integer categoriaID; // CORRECCIÓN: CAMBIADO de 'int' a 'Integer'
     private String categoriaNombre; // campo transitorio (JOIN con categoría)
+    private List<Integer> tallas; // campo transitorio para tallas
 
     public Producto() {
     }
 
-    public Producto(Integer id, String nombre, double precio, String imagenUrl, String descripcion,
-                    String estado, Integer categoriaID, String categoriaNombre) {
+    public Producto(Integer id, String nombre, BigDecimal precio, String imagenUrl, String descripcion,
+                    String estado, Integer categoriaID, String categoriaNombre, List<Integer> tallas) {
         this.id = id;
         this.nombre = nombre;
         this.precio = precio;
@@ -24,6 +28,7 @@ public class Producto {
         this.estado = estado;
         this.categoriaID = categoriaID;
         this.categoriaNombre = categoriaNombre;
+        this.tallas = tallas;
     }
 
     // Getters y setters
@@ -43,11 +48,11 @@ public class Producto {
         this.nombre = nombre;
     }
 
-    public double getPrecio() {
+    public BigDecimal getPrecio() {
         return precio;
     }
 
-    public void setPrecio(double precio) {
+    public void setPrecio(BigDecimal precio) {
         this.precio = precio;
     }
 
@@ -75,7 +80,6 @@ public class Producto {
         this.estado = estado;
     }
 
-    // CORRECCIÓN en Getter y Setter
     public Integer getCategoriaID() {
         return categoriaID;
     }
@@ -90,5 +94,13 @@ public class Producto {
 
     public void setCategoriaNombre(String categoriaNombre) {
         this.categoriaNombre = categoriaNombre;
+    }
+
+    public List<Integer> getTallas() {
+        return tallas;
+    }
+
+    public void setTallas(List<Integer> tallas) {
+        this.tallas = tallas;
     }
 }
