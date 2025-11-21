@@ -43,7 +43,7 @@
                 <p class="product-detail-description">${producto.descripcion}</p>
 
                 <!-- Formulario para agregar al carrito -->
-                <form method="post" action="${pageContext.request.contextPath}/carrito/agregar" class="purchase-options">
+                <form method="post" action="${pageContext.request.contextPath}/cliente/carrito/agregar" class="purchase-options">
 
                     <input type="hidden" name="productoId" value="${producto.id}">
 
