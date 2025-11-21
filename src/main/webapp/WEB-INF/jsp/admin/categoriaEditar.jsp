@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<c:set var="isEdit" value="${not empty categoria.categoriaId}" />
+<c:set var="isEdit" value="${not empty categoria.id}" />
 
 <!DOCTYPE html>
 <html lang="es">
@@ -49,7 +49,7 @@
                       action="${pageContext.request.contextPath}/admin/categorias/${isEdit ? 'actualizar' : 'guardar'}">
 
                     <c:if test="${isEdit}">
-                        <input type="hidden" name="categoriaId" value="${categoria.categoriaId}"/>
+                        <input type="hidden" name="id" value="${categoria.id}"/>
                     </c:if>
 
                     <div class="form-grid">

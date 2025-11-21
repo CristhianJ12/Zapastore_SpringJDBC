@@ -1,19 +1,25 @@
 package com.zapastore.zapastore_h2.model.categoria;
 
 public class Categoria {
-    private int categoriaId;
+
+    private Integer id;
     private String nombre;
-    private String estado; // "Activo" o "Inactivo"
+    private String estado; // Activo / Inactivo
 
-    public Categoria() {
+    public Categoria() {}
+
+    public Categoria(Integer id, String nombre, String estado) {
+        this.id = id;
+        this.nombre = nombre;
+        this.estado = estado;
     }
 
-    public int getCategoriaId() {
-        return categoriaId;
+    public Integer getId() {
+        return id;
     }
 
-    public void setCategoriaId(int categoriaId) {
-        this.categoriaId = categoriaId;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getNombre() {

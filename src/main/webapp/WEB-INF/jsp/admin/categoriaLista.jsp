@@ -75,7 +75,7 @@
                         <tbody>
                         <c:forEach var="cat" items="${categorias}">
                             <tr>
-                                <td>${cat.categoriaId}</td>
+                                <td>${cat.id}</td>
                                 <td>${cat.nombre}</td>
                                 <td>
                                     <span class="chip ${cat.estado == 'Activo' ? 'chip-activo' : 'chip-inactivo'}">
@@ -83,14 +83,14 @@
                                     </span>
                                 </td>
                                 <td class="actions-cell">
-                                    <a href="${pageContext.request.contextPath}/admin/categorias/mostrarEditar?id=${cat.categoriaId}"
+                                    <a href="${pageContext.request.contextPath}/admin/categorias/mostrarEditar?id=${cat.id}"
                                        class="icon-button edit"
                                        title="Editar">
                                         <span class="material-symbols-outlined">edit</span>
                                     </a>
 
                                     <c:if test="${cat.estado == 'Activo'}">
-                                        <a href="${pageContext.request.contextPath}/admin/categorias/eliminar?id=${cat.categoriaId}"
+                                        <a href="${pageContext.request.contextPath}/admin/categorias/eliminar?id=${cat.id}"
                                            class="icon-button delete"
                                            title="Inactivar"
                                            onclick="return confirm('¿Está seguro de desactivar la categoría ${cat.nombre}?');">

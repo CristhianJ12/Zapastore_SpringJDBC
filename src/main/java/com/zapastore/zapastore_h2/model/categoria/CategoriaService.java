@@ -8,11 +8,11 @@ public interface CategoriaService {
 
     List<Categoria> listarCategoriasActivas();
 
+    Categoria buscarPorId(Integer id);
+
     void guardar(Categoria categoria);
 
     void actualizar(Categoria categoria);
 
     void eliminar(Integer id);
-
-    Categoria buscarPorId(Integer id); // 👈 ESTE ES EL NOMBRE CORRECTO SEGÚN EL ERROR
 }
