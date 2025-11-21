@@ -8,9 +8,10 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
 @Repository
-public class ProductoRepository {
+public class ProductoRepository implements ProductoDAO {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -18,7 +19,7 @@ public class ProductoRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private final RowMapper<Producto> productoMapper = new RowMapper<>() {
+    private final RowMapper<Producto> mapper = new RowMapper<>() {
         @Override
         public Producto mapRow(@NonNull ResultSet rs, int rowNum) throws SQLException {
             Producto p = new Producto();
@@ -27,58 +28,58 @@ public class ProductoRepository {
             p.setPrecio(rs.getDouble("Precio"));
             p.setImagenUrl(rs.getString("img_Url"));
             p.setDescripcion(rs.getString("descripcion"));
-            p.setEstado(rs.getString("estado")); // ← tu modelo usa String ("Activo"/"Inactivo")
-            p.setCategoriaID(rs.getInt("categoria_ID"));
+            p.setEstado(rs.getString("estado"));
+
+            Object catObj = rs.getObject("categoria_ID");
+            p.setCategoriaID(catObj == null ? null : ((Number) catObj).intValue());
+
             p.setCategoriaNombre(rs.getString("categoria_nombre"));
             return p;
         }
     };
 
-    // 🔹 Listar productos
+    @Override
     public List<Producto> listarProductos() {
         String sql = """
-            SELECT 
-                p.producto_ID, p.nombre, p.Precio, p.img_Url, 
-                p.descripcion, p.estado, p.categoria_ID,
-                c.nombre AS categoria_nombre
+            SELECT p.producto_ID, p.nombre, p.Precio, p.img_Url,
+                   p.descripcion, p.estado, p.categoria_ID,
+                   c.nombre AS categoria_nombre
             FROM productos p
             LEFT JOIN categorias c ON p.categoria_ID = c.categoria_ID
             ORDER BY p.producto_ID ASC
         """;
-        return jdbcTemplate.query(sql, productoMapper);
+        return jdbcTemplate.query(sql, mapper);
     }
 
-    // 🔹 Buscar producto por ID
-    public Producto buscarPorId(int id) {
-        String sql = """
-            SELECT 
-                p.producto_ID, p.nombre, p.Precio, p.img_Url, 
-                p.descripcion, p.estado, p.categoria_ID,
-                c.nombre AS categoria_nombre
-            FROM productos p
-            LEFT JOIN categorias c ON p.categoria_ID = c.categoria_ID
-            WHERE p.producto_ID = ?
-        """;
-        List<Producto> lista = jdbcTemplate.query(sql, productoMapper, id);
-        return lista.isEmpty() ? null : lista.get(0);
-    }
-
-    // 🔹 Buscar por nombre
+    @Override
     public List<Producto> buscarPorNombre(String nombre) {
         String sql = """
-            SELECT 
-                p.producto_ID, p.nombre, p.Precio, p.img_Url, 
-                p.descripcion, p.estado, p.categoria_ID,
-                c.nombre AS categoria_nombre
+            SELECT p.producto_ID, p.nombre, p.Precio, p.img_Url,
+                   p.descripcion, p.estado, p.categoria_ID,
+                   c.nombre AS categoria_nombre
             FROM productos p
             LEFT JOIN categorias c ON p.categoria_ID = c.categoria_ID
             WHERE LOWER(p.nombre) = LOWER(?)
         """;
-        return jdbcTemplate.query(sql, productoMapper, nombre);
+        return jdbcTemplate.query(sql, mapper, nombre);
     }
 
-    // 🔹 Guardar nuevo producto
-    public void guardarProducto(Producto p) {
+    @Override
+    public Producto buscarPorId(int id) {
+        String sql = """
+            SELECT p.producto_ID, p.nombre, p.Precio, p.img_Url,
+                   p.descripcion, p.estado, p.categoria_ID,
+                   c.nombre AS categoria_nombre
+            FROM productos p
+            LEFT JOIN categorias c ON p.categoria_ID = c.categoria_ID
+            WHERE p.producto_ID = ?
+        """;
+        List<Producto> lista = jdbcTemplate.query(sql, mapper, id);
+        return lista.isEmpty() ? null : lista.get(0);
+    }
+
+    @Override
+    public void guardar(Producto p) {
         String sql = """
             INSERT INTO productos (nombre, Precio, img_Url, descripcion, estado, categoria_ID)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -88,17 +89,17 @@ public class ProductoRepository {
                 p.getPrecio(),
                 p.getImagenUrl(),
                 p.getDescripcion(),
-                "Activo",
+                p.getEstado(),
                 p.getCategoriaID()
         );
     }
 
-    // 🔹 Actualizar producto existente
-    public void actualizarProducto(Producto p) {
+    @Override
+    public void actualizar(Producto p) {
         String sql = """
-            UPDATE productos
-            SET nombre = ?, Precio = ?, img_Url = ?, descripcion = ?, categoria_ID = ?
-            WHERE producto_ID = ?
+            UPDATE productos SET nombre=?, Precio=?, img_Url=?, 
+                descripcion=?, categoria_ID=? 
+            WHERE producto_ID=?
         """;
         jdbcTemplate.update(sql,
                 p.getNombre(),
@@ -110,11 +111,19 @@ public class ProductoRepository {
         );
     }
 
-    // 🔹 Desactivar (cambiar estado)
-    public void desactivarProducto(int id) {
-        String sql = "UPDATE productos SET estado = 'Inactivo' WHERE producto_ID = ?";
-        jdbcTemplate.update(sql, id);
+    @Override
+    public void desactivar(int id) {
+        jdbcTemplate.update("UPDATE productos SET estado='Inactivo' WHERE producto_ID=?", id);
     }
 
-    
+    @Override
+    public boolean existeNombre(String nombre, Integer excluirId) {
+        String sql = "SELECT producto_ID FROM productos WHERE LOWER(nombre) = LOWER(?)";
+        List<Integer> ids = jdbcTemplate.query(sql, (rs, n) -> rs.getInt("producto_ID"), nombre);
+
+        if (ids.isEmpty()) return false;
+        if (excluirId == null) return true;
+
+        return ids.stream().anyMatch(id -> !Objects.equals(id, excluirId));
+    }
 }

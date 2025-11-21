@@ -109,6 +109,12 @@
                                         placeholder="${isEdit ? 'Dejar en blanco para mantener la actual' : 'Requerida'}"
                                         <c:if test="${!isEdit}">required</c:if>> <%-- Contraseña requerida solo al crear --%>
                             </div>
+                            <c:if test="${!isEdit}">
+                                <div class="campo">
+                                    <label for="confirmContrasena">Confirmar Contraseña</label>
+                                    <input type="password" id="confirmContrasena" name="confirmContrasena" required>
+                                </div>
+                            </c:if>
                         </div>
 
                         <div class="form-actions">

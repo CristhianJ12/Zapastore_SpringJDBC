@@ -19,48 +19,58 @@ public class ProductoController {
         this.categoriaService = categoriaService;
     }
 
-    // ✅ Solo este método basta
+    // Lista
     @GetMapping({ "", "/lista" })
     public String listarProductos(@RequestParam(value = "q", required = false) String query, Model model) {
-        List<Producto> productos = (query != null && !query.isEmpty())
-                ? productoService.buscarPorNombre(query)
-                : productoService.listarProductos();
+        List<Producto> productos =
+                (query != null && !query.isEmpty())
+                        ? productoService.buscarPorNombre(query)
+                        : productoService.listarProductos();
+
         model.addAttribute("productos", productos);
         model.addAttribute("currentQuery", query);
+
         return "admin/productoLista";
     }
 
+    // Crear
     @GetMapping("/crear")
     public String mostrarFormularioNuevo(Model model) {
-        Producto producto = new Producto();
-        List<Categoria> categorias = categoriaService.listarCategoriasActivas();
-
-        model.addAttribute("producto", producto);
-        model.addAttribute("categorias", categorias);
+        model.addAttribute("producto", new Producto());
+        model.addAttribute("categorias", categoriaService.listarCategoriasActivas());
         return "admin/formProducto";
     }
 
+    // Editar
     @GetMapping("/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable int id, Model model) {
         Producto producto = productoService.buscarPorId(id);
-        List<Categoria> categorias = categoriaService.listarCategoriasActivas();
 
         model.addAttribute("producto", producto);
-        model.addAttribute("categorias", categorias);
+        model.addAttribute("categorias", categoriaService.listarCategoriasActivas());
+
         return "admin/formProducto";
     }
 
+    // Guardar
     @PostMapping("/guardar")
     public String guardarProducto(@ModelAttribute Producto producto, Model model) {
         try {
-            if (producto.getId() > 0) {
+
+            // 🔥 CORRECCIÓN DEFINITIVA DE NULL POINTER
+            Integer id = producto.getId();
+            boolean esEdicion = (id != null && id > 0);
+
+            if (esEdicion) {
                 productoService.actualizarProducto(producto);
                 model.addAttribute("mensaje", "Producto actualizado correctamente.");
             } else {
                 productoService.guardarProducto(producto);
                 model.addAttribute("mensaje", "Producto registrado exitosamente.");
             }
+
             return "redirect:/admin/productos/lista";
+
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("categorias", categoriaService.listarCategoriasActivas());
@@ -68,6 +78,7 @@ public class ProductoController {
         }
     }
 
+    // Eliminar / Desactivar
     @GetMapping("/eliminar/{id}")
     public String desactivarProducto(@PathVariable int id) {
         productoService.desactivarProducto(id);

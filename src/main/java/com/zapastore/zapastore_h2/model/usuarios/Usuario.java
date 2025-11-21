@@ -4,7 +4,7 @@ public class Usuario {
     private String idUsuario;
     private String nombre;
     private String correo;
-    private String contrasena; // Solo para guardar/comparar, no se expone
+    private String contrasena; // Solo para guardar/comparar, no se expone en vistas
     private String telefono;
     private String rol; // "admin" o "cliente"
     private String estado; // "Activo" o "Inactivo"
@@ -20,7 +20,7 @@ public class Usuario {
     // Getters y Setters
     public String getIdUsuario() { return idUsuario; }
     public void setIdUsuario(String idUsuario) { this.idUsuario = idUsuario; }
-    
+
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
 

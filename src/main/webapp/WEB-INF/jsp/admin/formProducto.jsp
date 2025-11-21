@@ -3,7 +3,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%-- Definición de la variable isEdit para toda la lógica del formulario --%>
-<c:set var="isEdit" value="${producto.id > 0}" />
+<c:set var="isEdit" value="${not empty producto.id}" />
 
 <!DOCTYPE html>
 <html lang="es">
@@ -62,7 +62,7 @@
                                 <form:select path="categoriaID" id="categoriaID" required="true" class="select-control">
                                     <form:option value="" label="Seleccione una Categoría"/>
                                     <c:forEach var="cat" items="${categorias}">
-                                        <form:option value="${cat.categoriaId}" label="${cat.nombre}"/> 
+                                        <form:option value="${cat.id}" label="${cat.nombre}"/>
                                     </c:forEach>
                                 </form:select>
                                 <a href="${pageContext.request.contextPath}/admin/categorias"

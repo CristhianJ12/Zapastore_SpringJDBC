@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface CategoriaDAO {
 
-    List<Categoria> listarCategorias();
+    public List<Categoria> listarCategorias();
 
     List<Categoria> listarCategoriasActivas();
 

@@ -3,18 +3,18 @@ package com.zapastore.zapastore_h2.model.usuarios;
 import java.util.List;
 import java.util.Optional;
 
-// 💡 Interfaz UsuarioDAO
+// 💡 Interfaz UsuarioDAO (actualizada)
 public interface UsuarioDAO {
-    
-    // 💡 CORRECCIÓN: El tipo de retorno debe ser Optional<Usuario>
-    Optional<Usuario> findByCorreoAndContrasena(String correo, String contrasena);
-    
+
+    // Buscar por correo (separado de la verificación de contraseña)
+    Optional<Usuario> findByCorreo(String correo);
+
     boolean existsByCorreo(String correo);
-    
-    List<Usuario> listarUsuarios(); // Este método también podría causar un error si no coincide con el Repository.
-    
+
+    List<Usuario> listarUsuarios();
+
     Optional<Usuario> buscarPorId(String id);
-    
+
     boolean save(Usuario usuario);
     boolean actualizar(Usuario usuario);
     boolean desactivar(String id);

@@ -10,50 +10,39 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository 
+@Repository
 public class UsuarioRepository implements UsuarioDAO {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     /**
-     * Mapeador de filas corregido. Usa los nombres de columna EXACTOS
-     * de la base de datos: IDUsuario y Rol (con mayúsculas).
+     * Mapeador de filas. Incluye contrasena porque el servicio necesita verificarla internamente.
+     * Usa los nombres de columna EXACTOS de la base de datos: IDUsuario y Rol (con mayúsculas).
      */
     private final RowMapper<Usuario> usuarioRowMapper = (rs, rowNum) -> {
         Usuario usuario = new Usuario();
-        // 💡 CORRECCIÓN: Usar IDUsuario (mayúsculas) según el script SQL
-        usuario.setIdUsuario(rs.getString("IDUsuario")); 
+        usuario.setIdUsuario(rs.getString("IDUsuario"));
         usuario.setNombre(rs.getString("nombre"));
         usuario.setCorreo(rs.getString("correo"));
-        // NOTA: No se lee la contraseña aquí por seguridad
+        usuario.setContrasena(rs.getString("contrasena")); // necesario para autenticación interna
         usuario.setTelefono(rs.getString("telefono"));
-        // 💡 CORRECCIÓN: Usar Rol (con mayúscula) según el script SQL
-        usuario.setRol(rs.getString("Rol")); 
+        usuario.setRol(rs.getString("Rol"));
         usuario.setEstado(rs.getString("estado"));
         return usuario;
     };
 
     // -----------------------------------------------------
-    // 1. Implementación de Autenticación y Registro
+    // 1. Buscar por correo (nuevo)
     // -----------------------------------------------------
-
     @Override
-    public Optional<Usuario> findByCorreoAndContrasena(String correo, String contrasena) {
-        // La consulta SQL está bien
-        String sql = "SELECT * FROM usuarios WHERE correo = ? AND contrasena = ?";
+    public Optional<Usuario> findByCorreo(String correo) {
+        String sql = "SELECT * FROM usuarios WHERE correo = ?";
         try {
-            // queryForObject espera exactamente un resultado. Si no lo encuentra, lanza EmptyResultDataAccessException.
-            Usuario usuario = jdbcTemplate.queryForObject(sql, usuarioRowMapper, correo, contrasena);
-            
-            // Si llega aquí, el usuario existe. Verificamos el estado.
-            if (usuario != null && usuario.isActivo()) {
-                return Optional.of(usuario);
-            }
-            return Optional.empty(); 
+            Usuario usuario = jdbcTemplate.queryForObject(sql, usuarioRowMapper, correo);
+            return Optional.ofNullable(usuario);
         } catch (EmptyResultDataAccessException e) {
-            // No se encontró el usuario
-            return Optional.empty(); 
+            return Optional.empty();
         }
     }
 
@@ -67,16 +56,15 @@ public class UsuarioRepository implements UsuarioDAO {
     // -----------------------------------------------------
     // 2. Implementación de Métodos CRUD
     // -----------------------------------------------------
-
     @Override
     public List<Usuario> listarUsuarios() {
         String sql = "SELECT * FROM usuarios";
         return jdbcTemplate.query(sql, usuarioRowMapper);
     }
-    
+
     @Override
     public Optional<Usuario> buscarPorId(String id) {
-        String sql = "SELECT * FROM usuarios WHERE IDUsuario = ?"; // 💡 CORRECCIÓN: Usar IDUsuario en la cláusula WHERE
+        String sql = "SELECT * FROM usuarios WHERE IDUsuario = ?";
         try {
             Usuario usuario = jdbcTemplate.queryForObject(sql, usuarioRowMapper, id);
             return Optional.ofNullable(usuario);
@@ -87,9 +75,8 @@ public class UsuarioRepository implements UsuarioDAO {
 
     @Override
     public boolean save(Usuario usuario) {
-        // 💡 CORRECCIÓN: Usar IDUsuario y Rol en la lista de columnas
         String sql = "INSERT INTO usuarios (IDUsuario, nombre, correo, contrasena, telefono, Rol, estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        
+
         if (usuario.getIdUsuario() == null || usuario.getIdUsuario().isEmpty()) {
             usuario.setIdUsuario(UUID.randomUUID().toString());
         }
@@ -100,45 +87,40 @@ public class UsuarioRepository implements UsuarioDAO {
             usuario.setEstado("Activo");
         }
 
-        int rows = jdbcTemplate.update(sql, 
-            usuario.getIdUsuario(), 
-            usuario.getNombre(), 
-            usuario.getCorreo(), 
-            usuario.getContrasena(),
-            usuario.getTelefono(),
-            usuario.getRol(), // El valor de Java aquí está bien
-            usuario.getEstado()
+        int rows = jdbcTemplate.update(sql,
+                usuario.getIdUsuario(),
+                usuario.getNombre(),
+                usuario.getCorreo(),
+                usuario.getContrasena(),
+                usuario.getTelefono(),
+                usuario.getRol(),
+                usuario.getEstado()
         );
         return rows > 0;
     }
 
     @Override
     public boolean actualizar(Usuario usuario) {
-        // 💡 CORRECCIÓN: Usar Rol en la sentencia UPDATE y IDUsuario en el WHERE
-        String baseSql = "UPDATE usuarios SET nombre = ?, telefono = ?, Rol = ?, estado = ?";
-        
+        // Actualizamos solo la contraseña si viene no nula; de lo contrario la dejamos intacta.
         if (usuario.getContrasena() != null && !usuario.getContrasena().isEmpty()) {
-            baseSql += ", contrasena = ?";
-            baseSql += " WHERE IDUsuario = ?";
-            
-            int rows = jdbcTemplate.update(baseSql, 
-                usuario.getNombre(), 
-                usuario.getTelefono(), 
-                usuario.getRol(), 
-                usuario.getEstado(),
-                usuario.getContrasena(), 
-                usuario.getIdUsuario()
+            String sql = "UPDATE usuarios SET nombre = ?, telefono = ?, Rol = ?, estado = ?, contrasena = ? WHERE IDUsuario = ?";
+            int rows = jdbcTemplate.update(sql,
+                    usuario.getNombre(),
+                    usuario.getTelefono(),
+                    usuario.getRol(),
+                    usuario.getEstado(),
+                    usuario.getContrasena(),
+                    usuario.getIdUsuario()
             );
             return rows > 0;
         } else {
-            baseSql += " WHERE IDUsuario = ?";
-            
-            int rows = jdbcTemplate.update(baseSql, 
-                usuario.getNombre(), 
-                usuario.getTelefono(), 
-                usuario.getRol(), 
-                usuario.getEstado(),
-                usuario.getIdUsuario()
+            String sql = "UPDATE usuarios SET nombre = ?, telefono = ?, Rol = ?, estado = ? WHERE IDUsuario = ?";
+            int rows = jdbcTemplate.update(sql,
+                    usuario.getNombre(),
+                    usuario.getTelefono(),
+                    usuario.getRol(),
+                    usuario.getEstado(),
+                    usuario.getIdUsuario()
             );
             return rows > 0;
         }
@@ -146,21 +128,21 @@ public class UsuarioRepository implements UsuarioDAO {
 
     @Override
     public boolean desactivar(String id) {
-        String sql = "UPDATE usuarios SET estado = 'Inactivo' WHERE IDUsuario = ?"; // 💡 CORRECCIÓN: IDUsuario
+        String sql = "UPDATE usuarios SET estado = 'Inactivo' WHERE IDUsuario = ?";
         int rows = jdbcTemplate.update(sql, id);
         return rows > 0;
     }
 
     @Override
     public boolean activar(String id) {
-        String sql = "UPDATE usuarios SET estado = 'Activo' WHERE IDUsuario = ?"; // 💡 CORRECCIÓN: IDUsuario
+        String sql = "UPDATE usuarios SET estado = 'Activo' WHERE IDUsuario = ?";
         int rows = jdbcTemplate.update(sql, id);
         return rows > 0;
     }
-    
+
     @Override
     public boolean eliminar(String id) {
-        String sql = "DELETE FROM usuarios WHERE IDUsuario = ?"; // 💡 CORRECCIÓN: IDUsuario
+        String sql = "DELETE FROM usuarios WHERE IDUsuario = ?";
         int rows = jdbcTemplate.update(sql, id);
         return rows > 0;
     }

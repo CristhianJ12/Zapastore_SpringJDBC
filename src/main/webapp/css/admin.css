@@ -407,9 +407,9 @@
 
 /* --- Métricas Dashboard --- */
 .metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: var(--space-8);
+    /* Usaremos 3 columnas: 1:1:1. El large-panel usará 2. */
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6); /* Reducir un poco el gap para aprovechar el espacio */
 }
 
 .metric-panel {
@@ -422,9 +422,6 @@
     flex-direction: column;
 }
 
-.metric-panel.large-panel {
-    grid-column: 1 / -1;
-}
 
 .panel-header {
     display: flex;
@@ -436,13 +433,13 @@
 
 .chart-wrap {
     flex-grow: 1;
-    min-height: 250px;
+    min-height: 280px; /* Aumentado de 250px a 280px */
     position: relative;
     padding: var(--space-4) 0;
 }
 
 .metric-panel.large-panel .chart-wrap {
-    min-height: 350px;
+    min-height: 380px; /* Aumentado de 350px a 380px */
 }
 
 .panel-foot {

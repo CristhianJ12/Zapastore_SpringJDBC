@@ -11,15 +11,31 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     // Inyectamos el DAO/Repository
     @Autowired
-    private UsuarioDAO usuarioDAO; 
+    private UsuarioDAO usuarioDAO;
 
     // ======================================
     // Autenticación
     // ======================================
     @Override
     public Optional<Usuario> login(String correo, String contrasena) {
-        // La lógica de verificación de credenciales y estado "Activo" se maneja en el DAO
-        return usuarioDAO.findByCorreoAndContrasena(correo, contrasena);
+
+        // 1) Buscar usuario por correo
+        Optional<Usuario> usuarioOpt = usuarioDAO.findByCorreo(correo);
+        if (usuarioOpt.isEmpty()) return Optional.empty();
+
+        Usuario usuario = usuarioOpt.get();
+
+        // 2) Comparación directa (SIN BCrypt)
+        if (usuario.getContrasena() == null) return Optional.empty();
+
+        boolean matches = usuario.getContrasena().equals(contrasena);
+
+        if (matches && usuario.isActivo()) {
+            // Opcional: no exponemos contraseña
+            usuario.setContrasena(null);
+            return Optional.of(usuario);
+        }
+        return Optional.empty();
     }
 
     // ======================================
@@ -27,22 +43,26 @@ public class UsuarioServiceImpl implements UsuarioService {
     // ======================================
     @Override
     public boolean registrarCliente(Usuario usuario, String confirmPassword) {
-        // 1. Lógica de negocio: validación de contraseñas
-        if (!usuario.getContrasena().equals(confirmPassword)) {
-            // Podrías lanzar una excepción o retornar false
-            return false; 
+
+        // Validación básica (sin hashing)
+        if (usuario.getContrasena() == null || !usuario.getContrasena().equals(confirmPassword)) {
+            return false;
         }
 
-        // 2. Lógica de negocio: verificación de existencia
+        // Verificar existencia por correo
         if (usuarioDAO.existsByCorreo(usuario.getCorreo())) {
-            return false; // Correo ya existe
+            return false;
         }
-        
-        // 3. Lógica de negocio: asignar roles y estado por defecto (opcional, ya se hace en el DAO)
-        usuario.setRol("cliente");
-        usuario.setEstado("Activo");
 
-        // 4. Persistencia
+        // Asignar rol/estado por defecto si faltan
+        if (usuario.getRol() == null || usuario.getRol().isEmpty()) {
+            usuario.setRol("cliente");
+        }
+        if (usuario.getEstado() == null || usuario.getEstado().isEmpty()) {
+            usuario.setEstado("Activo");
+        }
+
+        // Se guarda tal cual, SIN encriptación
         return usuarioDAO.save(usuario);
     }
 
@@ -61,28 +81,52 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    public Optional<Usuario> buscarPorCorreo(String correo) {
+        return usuarioDAO.findByCorreo(correo);
+    }
+
+    @Override
     public boolean guardarUsuario(Usuario usuario) {
-        // En un caso real, aquí irían validaciones de formato, longitud, etc.
-        // También la lógica para hashear la contraseña si se está creando un usuario
+
+        // Evitar duplicación por correo
         if (usuarioDAO.existsByCorreo(usuario.getCorreo())) {
-            // Podrías verificar que no exista solo si es una operación de CREACIÓN
-            return false; 
+            return false;
         }
+
+        // No se encripta la contraseña
+        if (usuario.getContrasena() == null || usuario.getContrasena().isEmpty()) {
+            // si admin no pone contraseña, la dejamos nula o generamos una por defecto
+            usuario.setContrasena(usuario.getContrasena());
+        }
+
+        if (usuario.getRol() == null || usuario.getRol().isEmpty()) {
+            usuario.setRol("cliente");
+        }
+        if (usuario.getEstado() == null || usuario.getEstado().isEmpty()) {
+            usuario.setEstado("Activo");
+        }
+
         return usuarioDAO.save(usuario);
     }
 
     @Override
     public boolean actualizarUsuario(Usuario usuario) {
-        // Lógica de negocio: asegurar que el ID exista antes de actualizar
+
+        // Verificar que exista
         if (usuarioDAO.buscarPorId(usuario.getIdUsuario()).isEmpty()) {
             return false;
         }
+
+        // SIN hashing: si la contraseña viene vacía, el DAO no la debe modificar
+        if (usuario.getContrasena() != null && usuario.getContrasena().isEmpty()) {
+            usuario.setContrasena(null);
+        }
+
         return usuarioDAO.actualizar(usuario);
     }
 
     @Override
     public boolean desactivarUsuario(String id) {
-        // Lógica de negocio: verificar si es un admin el que desactiva, etc.
         return usuarioDAO.desactivar(id);
     }
 
@@ -93,7 +137,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public boolean eliminarUsuario(String id) {
-        // Lógica de negocio: chequear dependencias o permisos finales
         return usuarioDAO.eliminar(id);
     }
 }
