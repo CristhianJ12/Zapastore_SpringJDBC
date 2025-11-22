@@ -74,7 +74,7 @@
                                     <form action="${ctx}/cliente/carrito/actualizar" method="post">
 
                                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                                        <input type="hidden" name="detalleId" value="${item.id}"/>
+                                        <input type="hidden" name="detalleId" value="${item.detalleId}"/>
 
                                         <label for="qty-${item.id}">Cantidad:</label>
                                         <input type="number"
@@ -120,7 +120,7 @@
                                 <div class="cart-item-actions">
                                     <form action="${ctx}/cliente/carrito/eliminar" method="post">
                                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                                        <input type="hidden" name="detalleId" value="${item.id}"/>
+                                        <input type="hidden" name="detalleId" value="${item.detalleId}"/>
 
                                         <button type="submit"
                                                 class="delete-button"

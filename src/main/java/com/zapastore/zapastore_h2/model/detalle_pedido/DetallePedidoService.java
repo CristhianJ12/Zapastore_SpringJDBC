@@ -1,19 +1,46 @@
 package com.zapastore.zapastore_h2.model.detalle_pedido;
 
-import com.zapastore.zapastore_h2.model.producto.Producto;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional; // 💡 SOLUCIÓN CRÍTICA
 
+import java.math.BigDecimal;
 import java.util.List;
 
-public interface DetallePedidoService {
+@Service
+@Transactional // 👈 Aplica la transacción a todos los métodos
+public class DetallePedidoService {
 
-    List<DetallePedido> listarPorPedido(Integer pedidoId);
+    private final DetallePedidoDAO detalleDao;
 
-    DetallePedido buscarPorId(Integer id);
+    public DetallePedidoService(DetallePedidoDAO detalleDao) {
+        this.detalleDao = detalleDao;
+    }
 
-    void guardar(DetallePedido detalle);
+    public List<DetallePedido> listarPorPedido(Integer pedidoId) {
+        return detalleDao.listarPorPedido(pedidoId);
+    }
 
-    void actualizar(DetallePedido detalle);
+    public DetallePedido buscarPorId(Integer id) {
+        return detalleDao.buscarPorId(id);
+    }
 
-    void eliminar(Integer id);
+    public void guardar(DetallePedido d) {
+        detalleDao.guardar(d);
+    }
 
+    public void actualizar(DetallePedido d) {
+        detalleDao.actualizar(d);
+    }
+
+    public void eliminar(Integer id) {
+        detalleDao.eliminar(id);
+    }
+
+    public DetallePedido buscarPorPedidoProductoYTalla(Integer pedidoId, Integer productoId, Integer talla) {
+        return detalleDao.buscarPorPedidoProductoYTalla(pedidoId, productoId, talla);
+    }
+
+    public BigDecimal calcularSubtotalPorPedido(Integer pedidoId) {
+        return detalleDao.calcularSubtotalPorPedido(pedidoId);
+    }
 }

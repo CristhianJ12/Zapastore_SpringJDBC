@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 public class ItemCarrito {
 
     private Integer id; // id interno en sesión
-    private Integer detalleId; // id del detalle en la BD (opcional)
+    private Integer detalleId; // id del detalle en la BD 👈 Usado por el Controller
     private Producto producto;
     private Integer cantidad;
     private Integer talla;
@@ -33,28 +33,22 @@ public class ItemCarrito {
     // GETTERS / SETTERS
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
-
     public Integer getDetalleId() { return detalleId; }
     public void setDetalleId(Integer detalleId) { this.detalleId = detalleId; }
-
     public Producto getProducto() { return producto; }
     public void setProducto(Producto producto) { this.producto = producto; }
-
     public Integer getCantidad() { return cantidad; }
     public void setCantidad(Integer cantidad) {
         this.cantidad = cantidad;
         calcularSubtotal();
     }
-
     public Integer getTalla() { return talla; }
     public void setTalla(Integer talla) { this.talla = talla; }
-
     public BigDecimal getPrecioUnitario() { return precioUnitario; }
     public void setPrecioUnitario(BigDecimal precioUnitario) {
         this.precioUnitario = precioUnitario;
         calcularSubtotal();
     }
-
     public BigDecimal getSubtotal() { return subtotal; }
     public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
 }

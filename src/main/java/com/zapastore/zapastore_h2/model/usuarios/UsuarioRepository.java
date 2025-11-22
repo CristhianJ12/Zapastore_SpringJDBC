@@ -27,7 +27,8 @@ public class UsuarioRepository implements UsuarioDAO {
         usuario.setCorreo(rs.getString("correo"));
         usuario.setContrasena(rs.getString("contrasena")); // necesario para autenticación interna
         usuario.setTelefono(rs.getString("telefono"));
-        usuario.setRol(rs.getString("Rol"));
+        // 💡 CRÍTICO: Aseguramos que al mapear de la BD, el rol se guarde en mayúsculas
+        usuario.setRol(rs.getString("Rol").toUpperCase());
         usuario.setEstado(rs.getString("estado"));
         return usuario;
     };
@@ -80,9 +81,14 @@ public class UsuarioRepository implements UsuarioDAO {
         if (usuario.getIdUsuario() == null || usuario.getIdUsuario().isEmpty()) {
             usuario.setIdUsuario(UUID.randomUUID().toString());
         }
-        if (usuario.getRol() == null || usuario.getRol().isEmpty()) {
-            usuario.setRol("cliente");
+
+        // 💡 CRÍTICO: Homogeneizar el rol a MAYÚSCULAS antes de guardar
+        if (usuario.getRol() == null || usuario.getRol().isEmpty() || "cliente".equalsIgnoreCase(usuario.getRol())) {
+            usuario.setRol("CLIENTE");
+        } else if ("admin".equalsIgnoreCase(usuario.getRol())) {
+            usuario.setRol("ADMIN");
         }
+
         if (usuario.getEstado() == null || usuario.getEstado().isEmpty()) {
             usuario.setEstado("Activo");
         }
@@ -93,7 +99,7 @@ public class UsuarioRepository implements UsuarioDAO {
                 usuario.getCorreo(),
                 usuario.getContrasena(),
                 usuario.getTelefono(),
-                usuario.getRol(),
+                usuario.getRol(), // Ya está en mayúsculas
                 usuario.getEstado()
         );
         return rows > 0;
@@ -101,6 +107,11 @@ public class UsuarioRepository implements UsuarioDAO {
 
     @Override
     public boolean actualizar(Usuario usuario) {
+        // 💡 CRÍTICO: Homogeneizar el rol a MAYÚSCULAS antes de actualizar
+        if (usuario.getRol() != null) {
+            usuario.setRol(usuario.getRol().toUpperCase());
+        }
+
         // Actualizamos solo la contraseña si viene no nula; de lo contrario la dejamos intacta.
         if (usuario.getContrasena() != null && !usuario.getContrasena().isEmpty()) {
             String sql = "UPDATE usuarios SET nombre = ?, telefono = ?, Rol = ?, estado = ?, contrasena = ? WHERE IDUsuario = ?";

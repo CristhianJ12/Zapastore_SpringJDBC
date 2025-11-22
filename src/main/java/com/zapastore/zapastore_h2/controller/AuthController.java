@@ -37,11 +37,14 @@ public class AuthController {
         if (usuario != null && usuario.getContrasena() != null &&
                 usuario.getContrasena().equals(contrasena)) {
 
+            // 💡 CRÍTICO: El objeto 'usuario' que viene del findByCorreo ya tiene el rol en mayúsculas
+            // gracias al RowMapper actualizado en UsuarioRepository.java.
+
             session.setAttribute("usuarioSesion", usuario);
 
-            if ("admin".equalsIgnoreCase(usuario.getRol())) {
+            if ("ADMIN".equalsIgnoreCase(usuario.getRol())) {
                 return "redirect:/admin/metricas";
-            } else if ("cliente".equalsIgnoreCase(usuario.getRol())) {
+            } else if ("CLIENTE".equalsIgnoreCase(usuario.getRol())) {
                 return "redirect:/cliente/home";
             }
         }
@@ -86,8 +89,8 @@ public class AuthController {
             return "registrar";
         }
 
-        // Por defecto, rol cliente y activo
-        usuario.setRol("cliente");
+        // Por defecto, rol CLIENTE y Activo (la entidad Usuario y el Repository se encargarán de ponerlo en mayúsculas)
+        usuario.setRol("CLIENTE");
         usuario.setEstado("Activo");
 
         usuarioDao.save(usuario);

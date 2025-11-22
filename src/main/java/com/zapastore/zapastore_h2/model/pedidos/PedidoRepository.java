@@ -8,6 +8,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,8 +39,17 @@ public class PedidoRepository implements PedidoDAO {
             p.setFecha(rs.getTimestamp("fecha").toLocalDateTime());
             p.setEstado(rs.getString("estado"));
 
-            usuarioDAO.buscarPorId(rs.getString("IDCliente"))
+            // 💡 LOG CRÍTICO para ver qué IDCliente se está leyendo del Pedido
+            String idCliente = rs.getString("IDCliente");
+            System.out.println("DEBUG REPO: Mapeando Pedido ID " + p.getId() + " - IDCliente leído: " + idCliente);
+
+            usuarioDAO.buscarPorId(idCliente)
                     .ifPresent(p::setCliente);
+
+            // Si el cliente no se encuentra, p.getCliente() será null
+            if (p.getCliente() == null) {
+                System.out.println("ADVERTENCIA REPO: Cliente con ID " + idCliente + " NO ENCONTRADO para Pedido ID " + p.getId());
+            }
 
             return p;
         }
@@ -59,9 +69,14 @@ public class PedidoRepository implements PedidoDAO {
         } else {
             String sql = "INSERT INTO pedidos (IDCliente, total_pagar, CostoEnvio, fecha, estado) VALUES (?, ?, ?, ?, ?)";
             KeyHolder keyHolder = new GeneratedKeyHolder();
+
+            // 💡 LOG CRÍTICO: Verificación de IDCliente al INSERTAR
+            String clienteId = pedido.getCliente().getIdUsuario();
+            System.out.println("DEBUG REPO: Insertando nuevo Pedido para IDCliente: " + clienteId);
+
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                ps.setString(1, pedido.getCliente().getIdUsuario());
+                ps.setString(1, clienteId);
                 ps.setBigDecimal(2, pedido.getTotalPagar());
                 ps.setBigDecimal(3, pedido.getCostoEnvio());
                 ps.setTimestamp(4, Timestamp.valueOf(pedido.getFecha()));
@@ -80,6 +95,8 @@ public class PedidoRepository implements PedidoDAO {
     @Override
     public List<Pedido> findByCliente(Usuario cliente) {
         String sql = "SELECT * FROM pedidos WHERE IDCliente=?";
+        // 💡 LOG: IDCliente usado para buscar
+        System.out.println("DEBUG REPO: Buscando todos los Pedidos para IDCliente: " + cliente.getIdUsuario());
         return jdbcTemplate.query(sql, pedidoRowMapper, cliente.getIdUsuario());
     }
 
@@ -99,6 +116,8 @@ public class PedidoRepository implements PedidoDAO {
     @Override
     public List<Pedido> findByClienteAndEstado(Usuario cliente, String estado) {
         String sql = "SELECT * FROM pedidos WHERE IDCliente=? AND estado=?";
+        // 💡 LOG CRÍTICO: IDCliente usado para buscar Pendientes
+        System.out.println("DEBUG REPO: Buscando pedidos Pendientes para IDCliente: " + cliente.getIdUsuario());
         return jdbcTemplate.query(sql, pedidoRowMapper, cliente.getIdUsuario(), estado);
     }
 
@@ -108,5 +127,26 @@ public class PedidoRepository implements PedidoDAO {
     public List<Pedido> findByFechaBetween(LocalDateTime inicio, LocalDateTime fin) {
         String sql = "SELECT * FROM pedidos WHERE fecha >= ? AND fecha <= ?";
         return jdbcTemplate.query(sql, pedidoRowMapper, Timestamp.valueOf(inicio), Timestamp.valueOf(fin));
+    }
+
+    // 👈 NUEVO MÉTODO DE PERSISTENCIA
+    public void actualizarTotalPagar(Integer pedidoId, BigDecimal nuevoTotal) {
+        String sql = "UPDATE pedidos SET total_pagar=? WHERE pedido_ID=?";
+        jdbcTemplate.update(sql, nuevoTotal, pedidoId);
+    }
+
+    public void actualizarEstadoYFecha(Integer pedidoId, String nuevoEstado, LocalDateTime fecha) {
+        String sql = "UPDATE pedidos SET estado = ?, fecha = ? WHERE pedido_ID = ?";
+
+        // Convertir LocalDateTime a Timestamp para compatibilidad con JDBC
+        Timestamp fechaTimestamp = Timestamp.valueOf(fecha);
+
+        System.out.println("DEBUG REPO: Actualizando estado de Pedido ID " + pedidoId + " a " + nuevoEstado);
+
+        jdbcTemplate.update(sql,
+                nuevoEstado,
+                fechaTimestamp,
+                pedidoId
+        );
     }
 }

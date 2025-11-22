@@ -1,8 +1,11 @@
 package com.zapastore.zapastore_h2.model.pedidos;
 
+import com.zapastore.zapastore_h2.model.detalle_pedido.DetallePedido;
 import com.zapastore.zapastore_h2.model.usuarios.Usuario;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.sql.Timestamp; // 💡 Importación necesaria para la corrección
 
 public class Pedido {
 
@@ -12,6 +15,7 @@ public class Pedido {
     private BigDecimal costoEnvio;
     private LocalDateTime fecha;
     private String estado;
+    private List<DetallePedido> detalles;
 
     public Pedido() {}
 
@@ -40,6 +44,25 @@ public class Pedido {
     public LocalDateTime getFecha() { return fecha; }
     public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
 
+    // 💡 NUEVO GETTER DE COMPATIBILIDAD
+    /**
+     * Devuelve la fecha como java.sql.Timestamp para ser compatible con JSTL fmt:formatDate.
+     */
+    public Timestamp getFechaTimestamp() {
+        if (this.fecha == null) {
+            return null;
+        }
+        return Timestamp.valueOf(this.fecha);
+    }
+
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
+
+    public List<DetallePedido> getDetalles() {
+        return detalles;
+    }
+
+    public void setDetalles(List<DetallePedido> detalles) {
+        this.detalles = detalles;
+    }
 }

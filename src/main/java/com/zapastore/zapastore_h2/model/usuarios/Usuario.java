@@ -6,13 +6,13 @@ public class Usuario {
     private String correo;
     private String contrasena; // Solo para guardar/comparar, no se expone en vistas
     private String telefono;
-    private String rol; // "admin" o "cliente"
+    private String rol; // "ADMIN" o "CLIENTE" (Usaremos mayúsculas internamente)
     private String estado; // "Activo" o "Inactivo"
     private boolean activo; // Campo calculado basado en estado
 
     // Constructor (opcionalmente para pruebas/registro)
     public Usuario() {
-        this.rol = "cliente"; // Rol por defecto al registrar
+        this.rol = "CLIENTE"; // Rol por defecto al registrar (Homogeneizado a mayúsculas)
         this.estado = "Activo";
         this.activo = true;
     }
@@ -34,7 +34,10 @@ public class Usuario {
     public void setTelefono(String telefono) { this.telefono = telefono; }
 
     public String getRol() { return rol; }
-    public void setRol(String rol) { this.rol = rol; }
+    public void setRol(String rol) {
+        // 💡 CRÍTICO: Aseguramos que el rol siempre se guarde en MAYÚSCULAS para consistencia con la BD
+        this.rol = rol != null ? rol.toUpperCase() : "CLIENTE";
+    }
 
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; this.activo = "Activo".equalsIgnoreCase(estado); }
