@@ -21,11 +21,11 @@
 <div class="admin-layout">
 
     <!-- Sidebar -->
-    <jsp:include page="/WEB-INF/jsp/fragments/sidebar.jsp" />
+    <jsp:include page="/WEB-INF/fragments/sidebar.jsp" />
 
     <main class="main-panel">
         <!-- Header -->
-        <jsp:include page="/WEB-INF/jsp/fragments/header.jsp" />
+        <jsp:include page="/WEB-INF/fragments/header.jsp" />
 
         <!-- Contenido principal -->
         <div class="content-wrapper">

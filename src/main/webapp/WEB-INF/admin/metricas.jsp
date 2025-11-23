@@ -18,9 +18,9 @@
 
 <body class="admin-body">
 <div class="admin-layout">
-    <jsp:include page="/WEB-INF/jsp/fragments/sidebar.jsp"/>
+    <jsp:include page="/WEB-INF/fragments/sidebar.jsp"/>
     <main class="main-panel">
-        <jsp:include page="/WEB-INF/jsp/fragments/header.jsp"/>
+        <jsp:include page="/WEB-INF/fragments/header.jsp"/>
 
         <div class="content-wrapper">
             <div class="page-header">
