@@ -12,7 +12,6 @@ public class DetallePedidoRepository implements DetallePedidoDAO {
 
     private final JdbcTemplate jdbc;
 
-    // Definición explícita de columnas
     private static final String SELECT_COLUMNS =
             "pedidodetalle_ID, pedido_ID, producto_ID, cantidad, talla, precio_unitario, subtotal, nombre_producto";
 
@@ -36,10 +35,7 @@ public class DetallePedidoRepository implements DetallePedidoDAO {
     @Override
     public List<DetallePedido> listarPorPedido(Integer pedidoId) {
         String sql = "SELECT " + SELECT_COLUMNS + " FROM pedido_detalle WHERE pedido_ID=?";
-        System.out.println("DEBUG REPO DETALLE: Ejecutando SELECT: " + sql + " con ID: " + pedidoId);
-        List<DetallePedido> detalles = jdbc.query(sql, mapper, pedidoId);
-        System.out.println("DEBUG REPO DETALLE: Filas mapeadas: " + detalles.size());
-        return detalles;
+        return jdbc.query(sql, mapper, pedidoId);
     }
 
     @Override
@@ -51,30 +47,22 @@ public class DetallePedidoRepository implements DetallePedidoDAO {
 
     @Override
     public void guardar(DetallePedido d) {
-        jdbc.update("""
-            INSERT INTO pedido_detalle 
-            (pedido_ID, producto_ID, cantidad, talla, precio_unitario, subtotal, nombre_producto)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """,
-                d.getPedidoId(), d.getProductoId(), d.getCantidad(),
-                d.getTalla(), d.getPrecioUnitario(), d.getSubtotal(),
+        String sql = "INSERT INTO pedido_detalle (pedido_ID, producto_ID, cantidad, talla, precio_unitario, subtotal, nombre_producto) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        jdbc.update(sql,
+                d.getPedidoId(),
+                d.getProductoId(),
+                d.getCantidad(),
+                d.getTalla(),
+                d.getPrecioUnitario(),
+                d.getSubtotal(),
                 d.getNombreProducto()
         );
     }
 
     @Override
     public void actualizar(DetallePedido d) {
-        // 🚨 CORRECCIÓN CRÍTICA: La sentencia SQL ahora coincide con los 5 parámetros (cantidad, talla,
-        // precio_unitario, subtotal, nombre_producto) antes del WHERE.
-        jdbc.update("""
-            UPDATE pedido_detalle SET 
-            cantidad=?, 
-            talla=?, 
-            precio_unitario=?, 
-            subtotal=?, 
-            nombre_producto=?
-            WHERE pedidodetalle_ID=?
-        """,
+        String sql = "UPDATE pedido_detalle SET cantidad=?, talla=?, precio_unitario=?, subtotal=?, nombre_producto=? WHERE pedidodetalle_ID=?";
+        jdbc.update(sql,
                 d.getCantidad(),
                 d.getTalla(),
                 d.getPrecioUnitario(),
@@ -86,23 +74,20 @@ public class DetallePedidoRepository implements DetallePedidoDAO {
 
     @Override
     public void eliminar(Integer id) {
-        jdbc.update("DELETE FROM pedido_detalle WHERE pedidodetalle_ID=?", id);
+        String sql = "DELETE FROM pedido_detalle WHERE pedidodetalle_ID=?";
+        jdbc.update(sql, id);
     }
 
     @Override
     public DetallePedido buscarPorPedidoProductoYTalla(Integer pedidoId, Integer productoId, Integer talla) {
-        String sql = "SELECT " + SELECT_COLUMNS + """
-        FROM pedido_detalle
-        WHERE pedido_ID = ? AND producto_ID = ? AND talla = ?
-    """;
-
+        String sql = "SELECT " + SELECT_COLUMNS + " FROM pedido_detalle WHERE pedido_ID=? AND producto_ID=? AND talla=?";
         List<DetallePedido> lista = jdbc.query(sql, mapper, pedidoId, productoId, talla);
         return lista.isEmpty() ? null : lista.get(0);
     }
 
     @Override
     public BigDecimal calcularSubtotalPorPedido(Integer pedidoId) {
-        String sql = "SELECT SUM(subtotal) FROM pedido_detalle WHERE pedido_ID = ?";
+        String sql = "SELECT COALESCE(SUM(subtotal), 0) FROM pedido_detalle WHERE pedido_ID=?";
         BigDecimal total = jdbc.queryForObject(sql, BigDecimal.class, pedidoId);
         return total != null ? total : BigDecimal.ZERO;
     }

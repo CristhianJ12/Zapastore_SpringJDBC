@@ -1,49 +1,43 @@
-/*package com.zapastore.zapastore_h2.model.detalle_pedido;
+package com.zapastore.zapastore_h2.model.detalle_pedido;
 
-import com.zapastore.zapastore_h2.model.producto.ProductoService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // 👈 NUEVO
+import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 
 @Service
-@Transactional
 public class DetallePedidoServiceImpl implements DetallePedidoService {
 
     private final DetallePedidoDAO detalleDAO;
-    private final ProductoService productoService;
 
-    public DetallePedidoServiceImpl(DetallePedidoDAO detalleDAO, ProductoService productoService) {
+    public DetallePedidoServiceImpl(DetallePedidoDAO detalleDAO) {
         this.detalleDAO = detalleDAO;
-        this.productoService = productoService;
     }
-
-    // ... (Métodos listarPorPedido, buscarPorId, etc. que solo leen) ...
 
     @Override
     public List<DetallePedido> listarPorPedido(Integer pedidoId) {
-        return List.of();
+        return detalleDAO.listarPorPedido(pedidoId);
     }
 
     @Override
     public DetallePedido buscarPorId(Integer id) {
-        return null;
+        return detalleDAO.buscarPorId(id);
     }
 
     @Override
-    @Transactional // 👈 Aplicar para INSERT (Agregar al carrito)
+    @Transactional
     public void guardar(DetallePedido detalle) {
         detalleDAO.guardar(detalle);
     }
 
     @Override
-    @Transactional // 👈 Aplicar para UPDATE (Editar cantidad/talla)
+    @Transactional
     public void actualizar(DetallePedido detalle) {
         detalleDAO.actualizar(detalle);
     }
 
     @Override
-    @Transactional // 👈 Aplicar para DELETE (Eliminar del carrito)
+    @Transactional
     public void eliminar(Integer id) {
         detalleDAO.eliminar(id);
     }
@@ -57,4 +51,4 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
     public BigDecimal calcularSubtotalPorPedido(Integer pedidoId) {
         return detalleDAO.calcularSubtotalPorPedido(pedidoId);
     }
-}*/
+}
