@@ -2,7 +2,7 @@ package com.zapastore.zapastore_h2.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zapastore.zapastore_h2.model.pedidos.MetricaService;
+import com.zapastore.zapastore_h2.model.pedidos.PedidoService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,10 +15,10 @@ import java.time.temporal.TemporalAdjusters;
 @Controller
 public class MetricasController {
 
-    private final MetricaService metricaService;
+    private final PedidoService pedidoService;
 
-    public MetricasController(MetricaService metricaService) {
-        this.metricaService = metricaService;
+    public MetricasController(PedidoService pedidoService) {
+        this.pedidoService = pedidoService;
     }
 
     @GetMapping("/admin/metricas")
@@ -38,20 +38,17 @@ public class MetricasController {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        // Pasar JSON al JSP
-        model.addAttribute("pedidosDiaJson", mapper.writeValueAsString(metricaService.pedidosPorDia(diaSeleccionado)));
-        model.addAttribute("diasSemanaJson", mapper.writeValueAsString(metricaService.ventasPorDiaEnRango(inicioSemana, finSemana)));
-        model.addAttribute("mesesJson", mapper.writeValueAsString(metricaService.ventasPorMesEnRango(inicioMes, finMes)));
+        model.addAttribute("pedidosDiaJson", mapper.writeValueAsString(pedidoService.obtenerVentasPorDia(diaSeleccionado)));
+        model.addAttribute("diasSemanaJson", mapper.writeValueAsString(pedidoService.obtenerVentasPorSemana(inicioSemana, finSemana)));
+        model.addAttribute("mesesJson", mapper.writeValueAsString(pedidoService.obtenerVentasPorMes(inicioMes, finMes)));
 
-        // Totales
-        model.addAttribute("totalDia", metricaService.totalPorDia(diaSeleccionado));
-        model.addAttribute("pedidosDia", metricaService.cantidadPedidosPorDia(diaSeleccionado));
-        model.addAttribute("totalSemana", metricaService.totalPorRango(inicioSemana, finSemana));
-        model.addAttribute("pedidosSemana", metricaService.cantidadPedidosPorRango(inicioSemana, finSemana));
-        model.addAttribute("totalMes", metricaService.totalPorRango(inicioMes, finMes));
-        model.addAttribute("pedidosMes", metricaService.cantidadPedidosPorRango(inicioMes, finMes));
+        model.addAttribute("totalDia", pedidoService.calcularTotalVentasPorRango(diaSeleccionado, diaSeleccionado));
+        model.addAttribute("pedidosDia", pedidoService.contarPedidosCompletadosPorRango(diaSeleccionado, diaSeleccionado));
+        model.addAttribute("totalSemana", pedidoService.calcularTotalVentasPorRango(inicioSemana, finSemana));
+        model.addAttribute("pedidosSemana", pedidoService.contarPedidosCompletadosPorRango(inicioSemana, finSemana));
+        model.addAttribute("totalMes", pedidoService.calcularTotalVentasPorRango(inicioMes, finMes));
+        model.addAttribute("pedidosMes", pedidoService.contarPedidosCompletadosPorRango(inicioMes, finMes));
 
-        // Filtros
         model.addAttribute("diaSeleccionado", diaSeleccionado);
         model.addAttribute("fechaSemana", finSemana);
         model.addAttribute("mesInicio", mesInicio != null ? mesInicio : inicioMes.getMonthValue());

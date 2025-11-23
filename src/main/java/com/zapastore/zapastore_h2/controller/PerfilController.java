@@ -1,15 +1,17 @@
-package com.zapastore.zapastore_h2.model.usuarios;
+package com.zapastore.zapastore_h2.controller;
 
 import com.zapastore.zapastore_h2.model.pedidos.PedidoService;
+import com.zapastore.zapastore_h2.model.usuarios.Usuario;
+import com.zapastore.zapastore_h2.model.usuarios.UsuarioService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
-
 @Controller
 public class PerfilController {
 
@@ -28,12 +30,9 @@ public class PerfilController {
             return "redirect:/login";
         }
 
-        // Formato de fecha hasta minutos
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-        // Obtener solo pedidos completados y formatear la fecha como String
-        List<PedidoView> pedidosCompletados = pedidoService.findByCliente(cliente).stream()
-                .filter(p -> "Completado".equalsIgnoreCase(p.getEstado()))
+        List<PedidoView> pedidosCompletados = pedidoService.findByClienteAndEstado(cliente, "Completado").stream()
                 .map(p -> new PedidoView(
                         p.getId(),
                         p.getTotalPagar(),
@@ -43,27 +42,36 @@ public class PerfilController {
                 .collect(Collectors.toList());
 
         model.addAttribute("pedidos", pedidosCompletados);
-        return "cliente/perfil"; // JSP de perfil
+        return "cliente/perfil";
     }
 
-    // DTO para la vista
     public static class PedidoView {
         private Integer id;
-        private java.math.BigDecimal totalPagar;
+        private BigDecimal totalPagar;
         private String estado;
         private String fecha;
 
-        public PedidoView(Integer id, java.math.BigDecimal totalPagar, String estado, String fecha) {
+        public PedidoView(Integer id, BigDecimal totalPagar, String estado, String fecha) {
             this.id = id;
             this.totalPagar = totalPagar;
             this.estado = estado;
             this.fecha = fecha;
         }
 
-        // Getters
-        public Integer getId() { return id; }
-        public java.math.BigDecimal getTotalPagar() { return totalPagar; }
-        public String getEstado() { return estado; }
-        public String getFecha() { return fecha; }
+        public Integer getId() {
+            return id;
+        }
+
+        public BigDecimal getTotalPagar() {
+            return totalPagar;
+        }
+
+        public String getEstado() {
+            return estado;
+        }
+
+        public String getFecha() {
+            return fecha;
+        }
     }
 }
