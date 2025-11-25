@@ -1,6 +1,5 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-
 
 <c:set var="page" value="categorias" />
 
@@ -35,20 +34,33 @@
             </div>
 
             <c:if test="${not empty msg}">
-                <div class="alert success">${msg}</div>
+                <div class="alert success">
+                    <c:out value="${msg}" />
+                </div>
             </c:if>
 
             <section class="crud-area">
-                <form class="crud-form" action="${pageContext.request.contextPath}/admin/categorias/guardar" method="POST">
+
+                <!-- FORMULARIO PARA AGREGAR CATEGORÍA -->
+                <form class="crud-form"
+                      action="${pageContext.request.contextPath}/admin/categorias/guardar"
+                      method="POST">
+
                     <div class="form-grid">
+
                         <div class="campo">
                             <label for="nombre">Nueva categoría</label>
-                            <input type="text" name="nombre" id="nombre" placeholder="Ej. Deportivos" required class="input-text">
+                            <input type="text"
+                                   id="nombre"
+                                   name="nombre"
+                                   placeholder="Ej. Deportivos"
+                                   required
+                                   class="input-text">
                         </div>
 
                         <div class="campo">
-                            <label for="activo">Estado</label>
-                            <select name="estado" id="activo" class="input-select">
+                            <label for="estado">Estado</label>
+                            <select id="estado" name="estado" class="input-select">
                                 <option value="Activo" selected>Activo</option>
                                 <option value="Inactivo">Inactivo</option>
                             </select>
@@ -59,9 +71,11 @@
                                 <span class="material-symbols-outlined">add</span> Agregar
                             </button>
                         </div>
+
                     </div>
                 </form>
 
+                <!-- TABLA DE CATEGORÍAS -->
                 <div class="crud-lista">
                     <table class="crud-table">
                         <thead>
@@ -72,28 +86,36 @@
                                 <th>Acciones</th>
                             </tr>
                         </thead>
+
                         <tbody>
+
                         <c:forEach var="cat" items="${categorias}">
                             <tr>
-                                <td>${cat.id}</td>
-                                <td>${cat.nombre}</td>
+                                <td><c:out value="${cat.id}" /></td>
+                                <td><c:out value="${cat.nombre}" /></td>
+
                                 <td>
-                                    <span class="chip ${cat.estado == 'Activo' ? 'chip-activo' : 'chip-inactivo'}">
-                                        ${cat.estado}
+                                    <span class="chip 
+                                        <c:out value='${cat.estado == "Activo" ? "chip-activo" : "chip-inactivo"}' />">
+                                        <c:out value="${cat.estado}" />
                                     </span>
                                 </td>
+
                                 <td class="actions-cell">
+
+                                    <!-- BOTÓN EDITAR -->
                                     <a href="${pageContext.request.contextPath}/admin/categorias/mostrarEditar?id=${cat.id}"
                                        class="icon-button edit"
-                                       title="Editar">
+                                       title="Editar categoría">
                                         <span class="material-symbols-outlined">edit</span>
                                     </a>
 
+                                    <!-- BOTÓN DESACTIVAR -->
                                     <c:if test="${cat.estado == 'Activo'}">
                                         <a href="${pageContext.request.contextPath}/admin/categorias/eliminar?id=${cat.id}"
                                            class="icon-button delete"
-                                           title="Inactivar"
-                                           onclick="return confirm('¿Está seguro de desactivar la categoría ${cat.nombre}?');">
+                                           title="Inactivar categoría"
+                                           onclick="return confirm('¿Está seguro de desactivar la categoría &quot;${cat.nombre}&quot;?');">
                                             <span class="material-symbols-outlined">delete</span>
                                         </a>
                                     </c:if>
@@ -101,6 +123,7 @@
                             </tr>
                         </c:forEach>
 
+                        <!-- MENSAJE SI NO HAY CATEGORÍAS -->
                         <c:if test="${empty categorias}">
                             <tr>
                                 <td colspan="4" class="tabla-vacia">
@@ -108,9 +131,11 @@
                                 </td>
                             </tr>
                         </c:if>
+
                         </tbody>
                     </table>
                 </div>
+
             </section>
         </div>
     </main>

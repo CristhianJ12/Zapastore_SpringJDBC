@@ -7,38 +7,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZapaStore | Iniciar Sesión</title>
+
+    <!-- Fuentes -->
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900&display=swap">
-    
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900&display=swap">
+
+    <!-- Estilos -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/login.css">
 </head>
+
 <body class="light-mode">
 
 <div class="page-container">
 
+    <!-- HEADER -->
     <header class="main-header">
         <div class="container header-inner">
+
             <div class="header-left">
                 <a class="logo" href="<c:url value='/'/>">
-                    <img src="<c:url value='/img/logo.png'/>" alt="Logo ZapaStore" class="logo-image" height="24">
+                    <img src="<c:url value='/img/logo.png'/>"
+                         alt="Logo ZapaStore"
+                         class="logo-image"
+                         height="24">
                     <h1 class="logo-text">ZapaStore</h1>
                 </a>
             </div>
-            <div class="header-right">
-                </div>
+
+            <div class="header-right"></div>
         </div>
     </header>
 
+    <!-- MAIN -->
     <main class="main-content">
         <section class="container login-section">
             <div class="login-form-container">
+
                 <h2 class="section-title login-title">Iniciar Sesión</h2>
 
+                <!-- MENSAJES DE ESTADO -->
                 <c:if test="${not empty error}">
-                    <div class="alert error">${error}</div>
+                    <div class="alert error">
+                        <c:out value="${error}"/>
+                    </div>
                 </c:if>
+
                 <c:if test="${not empty msg}">
-                    <div class="alert success">${msg}</div>
+                    <div class="alert success">
+                        <c:out value="${msg}"/>
+                    </div>
                 </c:if>
 
                 <c:if test="${param.logout != null}">
@@ -47,29 +65,53 @@
                     </div>
                 </c:if>
 
+                <!-- FORMULARIO -->
                 <form action="<c:url value='/login'/>" method="post" class="login-form">
-                    
+
+                    <!-- CORREO -->
                     <div class="form-group">
                         <label for="correo" class="form-label">Correo electrónico</label>
-                        <input type="email" name="correo" id="correo" class="form-input" placeholder="ejemplo@correo.com" value="${correo}" required>
+                        <input
+                                type="email"
+                                name="correo"
+                                id="correo"
+                                class="form-input"
+                                placeholder="ejemplo@correo.com"
+                                value="<c:out value='${correo}'/>"
+                                required>
                     </div>
 
+                    <!-- CONTRASEÑA -->
                     <div class="form-group">
                         <label for="contrasena" class="form-label">Contraseña</label>
-                        <input type="password" name="contrasena" id="contrasena" class="form-input" placeholder="********" required>
+                        <input
+                                type="password"
+                                name="contrasena"
+                                id="contrasena"
+                                class="form-input"
+                                placeholder="********"
+                                required>
                     </div>
 
-                    <button type="submit" class="primary-button login-button">Ingresar</button>
-
+                    <!-- BOTÓN -->
+                    <button type="submit" class="primary-button login-button">
+                        Ingresar
+                    </button>
                 </form>
 
+                <!-- REGISTRO -->
                 <p class="signup-link">
-                    ¿No tienes cuenta? 
-                    <a href="<c:url value='/registrar'/>" class="color-primary-link">Regístrate</a>
+                    ¿No tienes cuenta?
+                    <a href="<c:url value='/registrar'/>"
+                       class="color-primary-link">
+                        Regístrate
+                    </a>
                 </p>
+
             </div>
         </section>
     </main>
+
 </div>
 
 </body>

@@ -7,75 +7,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZapaStore | Catálogo</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css"> 
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/index.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900&display=swap">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-    
 </head>
+
 <body class="light-mode">
-    <div class="page-container">
+<div class="page-container">
 
-        <%@ include file="../fragments/clienteheader.jsp" %>
+    <!-- HEADER -->
+    <%@ include file="../fragments/clienteheader.jsp" %>
 
-        <main class="container main-content-padding">
+    <!-- MAIN -->
+    <main class="container main-content-padding">
 
-            <!-- Contenedor principal del catálogo -->
-            <div class="catalog-container">
+        <!-- CATALOGO -->
+        <div class="catalog-container">
 
-                <!-- Toolbar: título + filtros -->
-                <section class="catalog-toolbar section-padding-y">
-                    <div>
-                        <h1 class="section-title">Catálogo de Productos</h1>
-                        <p class="section-subtitle">Explora nuestras categorías y encuentra lo que necesitas.</p>
-                    </div>
+            <!-- Toolbar: título + filtros -->
+            <section class="catalog-toolbar section-padding-y">
+                <div>
+                    <h1 class="section-title">Catálogo de Productos</h1>
+                    <p class="section-subtitle">Explora nuestras categorías y encuentra lo que necesitas.</p>
+                </div>
 
-                    <div class="toolbar-actions">
-                        <form method="get" action="${pageContext.request.contextPath}/cliente/catalogo">
-                            <select class="select-category" name="categoriaId" onchange="this.form.submit()">
-                                <option value="">Todas las categorías</option>
-                                <c:forEach var="categoria" items="${categorias}">
-                                    <option value="${categoria.id}"
-                                        <c:if test="${param.categoriaId == categoria.id}">selected</c:if>>
-                                        ${categoria.nombre}
-                                    </option>
-                                </c:forEach>
-                            </select>
-                        </form>
-                    </div>
-                </section>
+                <div class="toolbar-actions">
+                    <form method="get" action="${pageContext.request.contextPath}/cliente/catalogo">
+                        <label for="categoria-select" class="visually-hidden">Filtrar por categoría</label>
+                        <select id="categoria-select" class="select-category" name="categoriaId" onchange="this.form.submit()">
+                            <option value="">Todas las categorías</option>
+                            <c:forEach var="categoria" items="${categorias}">
+                                <option value="<c:out value='${categoria.id}'/>"
+                                    <c:if test="${param.categoriaId == categoria.id}">selected</c:if>>
+                                    <c:out value="${categoria.nombre}"/>
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </form>
+                </div>
+            </section>
 
-                <!-- Grid de productos -->
-                <section class="product-grid">
-                    <c:forEach var="producto" items="${productos}">
-                        <a href="${pageContext.request.contextPath}/cliente/producto/${producto.id}"
-                           class="product-card-link"
-                           aria-label="Ver producto: ${producto.nombre}"
-                           style="text-decoration:none;color:inherit;display:block;">
-                            <article class="product-card">
-                                <div class="product-image-wrapper">
-                                    <img alt="${producto.nombre}" class="product-image" src="${pageContext.request.contextPath}/${producto.imagenUrl}">
-                                </div>
-                                <div class="product-body">
-                                    <h3 class="product-title">Producto: ${producto.nombre}</h3>
-                                    <div class="product-description">Estilo: ${producto.categoriaNombre}</div>
-                                    <p class="product-description">${producto.descripcion}</p>
-                                    <p class="product-price">Precio: S/. ${producto.precio}</p>
-                                </div>
-                            </article>
-                        </a>
-                    </c:forEach>
-                </section>
+            <!-- Grid de productos -->
+            <section class="product-grid">
+                <c:forEach var="producto" items="${productos}">
+                    <a href="${pageContext.request.contextPath}/cliente/producto/<c:out value='${producto.id}'/>"
+                       class="product-card-link"
+                       aria-label="Ver producto: <c:out value='${producto.nombre}'/>"
+                       style="text-decoration:none;color:inherit;display:block;">
+                        <article class="product-card">
 
-            </div> <!-- /.catalog-container -->
+                            <!-- Imagen del producto -->
+                            <div class="product-image-wrapper">
+                                <img alt="<c:out value='${producto.nombre}'/>"
+                                     class="product-image"
+                                     src="${pageContext.request.contextPath}/<c:out value='${producto.imagenUrl}'/>">
+                            </div>
 
-        </main>
+                            <!-- Información del producto -->
+                            <div class="product-body">
+                                <h3 class="product-title">Producto: <c:out value="${producto.nombre}"/></h3>
+                                <div class="product-description">Estilo: <c:out value="${producto.categoriaNombre}"/></div>
+                                <p class="product-description"><c:out value="${producto.descripcion}"/></p>
+                                <p class="product-price">Precio: S/. <c:out value="${producto.precio}"/></p>
+                            </div>
 
-        <%@ include file="../fragments/footer.jsp" %>
+                        </article>
+                    </a>
+                </c:forEach>
+            </section>
 
-    </div>
+        </div> <!-- /.catalog-container -->
+
+    </main>
+
+    <!-- FOOTER -->
+    <%@ include file="../fragments/footer.jsp" %>
+
+</div>
 </body>
 </html>
