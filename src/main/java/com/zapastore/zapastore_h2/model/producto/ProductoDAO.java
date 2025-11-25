@@ -11,7 +11,5 @@ public interface ProductoDAO {
     void actualizar(Producto producto);
     void desactivar(int id);
     boolean existeNombre(String nombre, Integer excluirId);
-
-    // Nuevo
     List<Producto> buscarPorCategoria(Integer categoriaId);
 }
