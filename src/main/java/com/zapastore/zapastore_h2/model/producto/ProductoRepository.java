@@ -59,9 +59,11 @@ public class ProductoRepository implements ProductoDAO {
                    c.nombre AS categoria_nombre
             FROM productos p
             LEFT JOIN categorias c ON p.categoria_ID = c.categoria_ID
-            WHERE LOWER(p.nombre) = LOWER(?)
+            WHERE LOWER(p.nombre) LIKE LOWER(?)
+            ORDER BY p.producto_ID ASC
         """;
-        return jdbcTemplate.query(sql, mapper, nombre);
+        String param = "%" + (nombre == null ? "" : nombre.trim()) + "%";
+        return jdbcTemplate.query(sql, mapper, param);
     }
 
     @Override
@@ -119,7 +121,7 @@ public class ProductoRepository implements ProductoDAO {
     @Override
     public boolean existeNombre(String nombre, Integer excluirId) {
         String sql = "SELECT producto_ID FROM productos WHERE LOWER(nombre) = LOWER(?)";
-        List<Integer> ids = jdbcTemplate.query(sql, (rs, n) -> rs.getInt("producto_ID"), nombre);
+        List<Integer> ids = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("producto_ID"), nombre);
 
         if (ids.isEmpty()) return false;
         if (excluirId == null) return true;
@@ -130,15 +132,14 @@ public class ProductoRepository implements ProductoDAO {
     @Override
     public List<Producto> buscarPorCategoria(Integer categoriaId) {
         String sql = """
-        SELECT p.producto_ID, p.nombre, p.Precio, p.img_Url,
-               p.descripcion, p.estado, p.categoria_ID,
-               c.nombre AS categoria_nombre
-        FROM productos p
-        LEFT JOIN categorias c ON p.categoria_ID = c.categoria_ID
-        WHERE p.categoria_ID = ?
-        ORDER BY p.producto_ID ASC
-    """;
+            SELECT p.producto_ID, p.nombre, p.Precio, p.img_Url,
+                   p.descripcion, p.estado, p.categoria_ID,
+                   c.nombre AS categoria_nombre
+            FROM productos p
+            LEFT JOIN categorias c ON p.categoria_ID = c.categoria_ID
+            WHERE p.categoria_ID = ?
+            ORDER BY p.producto_ID ASC
+        """;
         return jdbcTemplate.query(sql, mapper, categoriaId);
     }
-
 }

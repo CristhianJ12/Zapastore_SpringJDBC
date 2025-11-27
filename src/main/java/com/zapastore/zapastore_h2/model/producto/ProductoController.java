@@ -1,6 +1,5 @@
 package com.zapastore.zapastore_h2.model.producto;
 
-import com.zapastore.zapastore_h2.model.categoria.Categoria;
 import com.zapastore.zapastore_h2.model.categoria.CategoriaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,7 +18,6 @@ public class ProductoController {
         this.categoriaService = categoriaService;
     }
 
-    // Lista
     @GetMapping({ "", "/lista" })
     public String listarProductos(@RequestParam(value = "q", required = false) String query, Model model) {
         List<Producto> productos =
@@ -33,7 +31,6 @@ public class ProductoController {
         return "admin/productoLista";
     }
 
-    // Crear
     @GetMapping("/crear")
     public String mostrarFormularioNuevo(Model model) {
         model.addAttribute("producto", new Producto());
@@ -41,26 +38,20 @@ public class ProductoController {
         return "admin/formProducto";
     }
 
-    // Editar
     @GetMapping("/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable int id, Model model) {
         Producto producto = productoService.buscarPorId(id);
-
         model.addAttribute("producto", producto);
         model.addAttribute("categorias", categoriaService.listarCategoriasActivas());
-
         return "admin/formProducto";
     }
 
-    // Guardar
     @PostMapping("/guardar")
     public String guardarProducto(@ModelAttribute Producto producto, Model model) {
+        Integer id = producto.getId();
+        boolean esEdicion = (id != null && id > 0);
+
         try {
-
-            // 🔥 CORRECCIÓN DEFINITIVA DE NULL POINTER
-            Integer id = producto.getId();
-            boolean esEdicion = (id != null && id > 0);
-
             if (esEdicion) {
                 productoService.actualizarProducto(producto);
                 model.addAttribute("mensaje", "Producto actualizado correctamente.");
@@ -68,9 +59,7 @@ public class ProductoController {
                 productoService.guardarProducto(producto);
                 model.addAttribute("mensaje", "Producto registrado exitosamente.");
             }
-
             return "redirect:/admin/productos/lista";
-
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("categorias", categoriaService.listarCategoriasActivas());
@@ -78,11 +67,9 @@ public class ProductoController {
         }
     }
 
-    // Eliminar / Desactivar
     @GetMapping("/eliminar/{id}")
     public String desactivarProducto(@PathVariable int id) {
         productoService.desactivarProducto(id);
         return "redirect:/admin/productos/lista";
     }
-
 }

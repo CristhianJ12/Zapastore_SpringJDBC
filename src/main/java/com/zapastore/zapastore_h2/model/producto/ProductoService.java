@@ -9,9 +9,6 @@ public interface ProductoService {
     void actualizarProducto(Producto producto);
     void desactivarProducto(int id);
     List<Producto> buscarPorNombre(String nombre);
-
-    // Nuevo método
     List<Producto> buscarPorCategoria(Integer categoriaId);
-
     boolean existeNombre(String nombre, Integer excluirId);
 }

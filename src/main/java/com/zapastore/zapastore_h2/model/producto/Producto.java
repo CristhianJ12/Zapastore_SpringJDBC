@@ -11,9 +11,9 @@ public class Producto {
     private String imagenUrl;
     private String descripcion;
     private String estado;
-    private Integer categoriaID; // CORRECCIÓN: CAMBIADO de 'int' a 'Integer'
-    private String categoriaNombre; // campo transitorio (JOIN con categoría)
-    private List<Integer> tallas; // campo transitorio para tallas
+    private Integer categoriaID;
+    private String categoriaNombre;
+    private List<Integer> tallas;
 
     public Producto() {
     }
@@ -31,7 +31,6 @@ public class Producto {
         this.tallas = tallas;
     }
 
-    // Getters y setters
     public Integer getId() {
         return id;
     }
