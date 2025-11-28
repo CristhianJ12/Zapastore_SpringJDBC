@@ -2,7 +2,6 @@ package com.zapastore.zapastore_h2.model.pedidos;
 
 import com.zapastore.zapastore_h2.model.usuarios.Usuario;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;

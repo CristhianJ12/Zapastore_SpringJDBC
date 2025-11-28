@@ -1,6 +1,5 @@
 package com.zapastore.zapastore_h2.model.usuarios;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,29 +12,24 @@ import java.util.UUID;
 @Repository
 public class UsuarioRepository implements UsuarioDAO {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
-    /**
-     * Mapeador de filas. Incluye contrasena porque el servicio necesita verificarla internamente.
-     * Usa los nombres de columna EXACTOS de la base de datos: IDUsuario y Rol (con mayúsculas).
-     */
+    public UsuarioRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
     private final RowMapper<Usuario> usuarioRowMapper = (rs, rowNum) -> {
         Usuario usuario = new Usuario();
         usuario.setIdUsuario(rs.getString("IDUsuario"));
         usuario.setNombre(rs.getString("nombre"));
         usuario.setCorreo(rs.getString("correo"));
-        usuario.setContrasena(rs.getString("contrasena")); // necesario para autenticación interna
+        usuario.setContrasena(rs.getString("contrasena"));
         usuario.setTelefono(rs.getString("telefono"));
-        // 💡 CRÍTICO: Aseguramos que al mapear de la BD, el rol se guarde en mayúsculas
         usuario.setRol(rs.getString("Rol").toUpperCase());
         usuario.setEstado(rs.getString("estado"));
         return usuario;
     };
 
-    // -----------------------------------------------------
-    // 1. Buscar por correo (nuevo)
-    // -----------------------------------------------------
     @Override
     public Optional<Usuario> findByCorreo(String correo) {
         String sql = "SELECT * FROM usuarios WHERE correo = ?";
@@ -54,9 +48,6 @@ public class UsuarioRepository implements UsuarioDAO {
         return count != null && count > 0;
     }
 
-    // -----------------------------------------------------
-    // 2. Implementación de Métodos CRUD
-    // -----------------------------------------------------
     @Override
     public List<Usuario> listarUsuarios() {
         String sql = "SELECT * FROM usuarios";
@@ -82,7 +73,6 @@ public class UsuarioRepository implements UsuarioDAO {
             usuario.setIdUsuario(UUID.randomUUID().toString());
         }
 
-        // 💡 CRÍTICO: Homogeneizar el rol a MAYÚSCULAS antes de guardar
         if (usuario.getRol() == null || usuario.getRol().isEmpty() || "cliente".equalsIgnoreCase(usuario.getRol())) {
             usuario.setRol("CLIENTE");
         } else if ("admin".equalsIgnoreCase(usuario.getRol())) {
@@ -99,7 +89,7 @@ public class UsuarioRepository implements UsuarioDAO {
                 usuario.getCorreo(),
                 usuario.getContrasena(),
                 usuario.getTelefono(),
-                usuario.getRol(), // Ya está en mayúsculas
+                usuario.getRol(),
                 usuario.getEstado()
         );
         return rows > 0;
@@ -107,12 +97,10 @@ public class UsuarioRepository implements UsuarioDAO {
 
     @Override
     public boolean actualizar(Usuario usuario) {
-        // 💡 CRÍTICO: Homogeneizar el rol a MAYÚSCULAS antes de actualizar
         if (usuario.getRol() != null) {
             usuario.setRol(usuario.getRol().toUpperCase());
         }
 
-        // Actualizamos solo la contraseña si viene no nula; de lo contrario la dejamos intacta.
         if (usuario.getContrasena() != null && !usuario.getContrasena().isEmpty()) {
             String sql = "UPDATE usuarios SET nombre = ?, telefono = ?, Rol = ?, estado = ?, contrasena = ? WHERE IDUsuario = ?";
             int rows = jdbcTemplate.update(sql,

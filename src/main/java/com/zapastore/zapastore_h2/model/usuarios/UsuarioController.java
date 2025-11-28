@@ -18,14 +18,10 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    // ==========================================================
-    // LISTAR
-    // ==========================================================
     @GetMapping
     public String listarUsuarios(Model model,
                                  @ModelAttribute("msg") String msg,
                                  @ModelAttribute("error") String error) {
-
         List<Usuario> usuarios = usuarioService.listarTodos();
         model.addAttribute("usuarios", usuarios);
         model.addAttribute("msg", msg);
@@ -33,9 +29,6 @@ public class UsuarioController {
         return "admin/usuarioLista";
     }
 
-    // ==========================================================
-    // FORMULARIOS
-    // ==========================================================
     @GetMapping("/mostrarCrear")
     public String mostrarFormularioCrear(Model model) {
         model.addAttribute("usuario", new Usuario());
@@ -44,7 +37,6 @@ public class UsuarioController {
 
     @GetMapping("/mostrarEditar/{id}")
     public String mostrarFormularioEditar(@PathVariable("id") String id, Model model, RedirectAttributes ra) {
-
         Optional<Usuario> usuarioOpt = usuarioService.buscarPorId(id);
 
         if (usuarioOpt.isEmpty()) {
@@ -56,30 +48,22 @@ public class UsuarioController {
         return "admin/usuarioForm";
     }
 
-    // ==========================================================
-    // GUARDAR NUEVO USUARIO
-    // ==========================================================
     @PostMapping("/guardar")
     public String guardarUsuario(@ModelAttribute Usuario usuario,
                                  @RequestParam("confirmContrasena") String confirmContrasena,
                                  RedirectAttributes ra) {
-
         if (usuario.getCorreo() == null || usuario.getCorreo().trim().isEmpty() ||
                 usuario.getContrasena() == null || usuario.getContrasena().trim().isEmpty()) {
-
             ra.addFlashAttribute("error", "El correo y la contraseña son obligatorios.");
             return "redirect:/admin/usuarios/mostrarCrear";
         }
 
-        // *** CORRECCIÓN: validar correo EXISTENTE correctamente ***
         if (usuarioService.listarTodos().stream()
                 .anyMatch(u -> u.getCorreo().equalsIgnoreCase(usuario.getCorreo()))) {
-
             ra.addFlashAttribute("error", "El correo ya está registrado.");
             return "redirect:/admin/usuarios/mostrarCrear";
         }
 
-        // *** CONFIRMACIÓN DE CONTRASEÑA (sin hashing) ***
         if (!usuario.getContrasena().equals(confirmContrasena)) {
             ra.addFlashAttribute("error", "Las contraseñas no coinciden.");
             return "redirect:/admin/usuarios/mostrarCrear";
@@ -96,14 +80,10 @@ public class UsuarioController {
         return "redirect:/admin/usuarios";
     }
 
-    // ==========================================================
-    // ACTUALIZAR
-    // ==========================================================
     @PostMapping("/actualizar")
     public String actualizarUsuario(Usuario usuario,
                                     @RequestParam(value = "contrasenaNueva", required = false) String contrasenaNueva,
                                     RedirectAttributes ra) {
-
         if (usuario.getNombre() == null || usuario.getNombre().trim().isEmpty()) {
             ra.addFlashAttribute("error", "El nombre no puede estar vacío.");
             return "redirect:/admin/usuarios/mostrarEditar/" + usuario.getIdUsuario();
@@ -134,12 +114,8 @@ public class UsuarioController {
         return "redirect:/admin/usuarios";
     }
 
-    // ==========================================================
-    // ACTIVAR / DESACTIVAR / ELIMINAR
-    // ==========================================================
     @GetMapping("/desactivar/{id}")
     public String desactivarUsuario(@PathVariable("id") String id, RedirectAttributes ra) {
-
         Optional<Usuario> usuarioOpt = usuarioService.buscarPorId(id);
 
         if (usuarioOpt.isEmpty()) {
@@ -160,7 +136,6 @@ public class UsuarioController {
 
     @GetMapping("/activar/{id}")
     public String activarUsuario(@PathVariable("id") String id, RedirectAttributes ra) {
-
         Optional<Usuario> usuarioOpt = usuarioService.buscarPorId(id);
 
         if (usuarioOpt.isEmpty()) {
@@ -181,7 +156,6 @@ public class UsuarioController {
 
     @GetMapping("/eliminar/{id}")
     public String eliminarUsuario(@PathVariable("id") String id, RedirectAttributes ra) {
-
         Optional<Usuario> usuarioOpt = usuarioService.buscarPorId(id);
         String nombreUsuario = usuarioOpt.map(Usuario::getNombre).orElse("desconocido");
 

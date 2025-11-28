@@ -4,44 +4,81 @@ public class Usuario {
     private String idUsuario;
     private String nombre;
     private String correo;
-    private String contrasena; // Solo para guardar/comparar, no se expone en vistas
+    private String contrasena;
     private String telefono;
-    private String rol; // "ADMIN" o "CLIENTE" (Usaremos mayúsculas internamente)
-    private String estado; // "Activo" o "Inactivo"
-    private boolean activo; // Campo calculado basado en estado
+    private String rol;
+    private String estado;
+    private boolean activo;
 
-    // Constructor (opcionalmente para pruebas/registro)
     public Usuario() {
-        this.rol = "CLIENTE"; // Rol por defecto al registrar (Homogeneizado a mayúsculas)
+        this.rol = "CLIENTE";
         this.estado = "Activo";
         this.activo = true;
     }
 
-    // Getters y Setters
-    public String getIdUsuario() { return idUsuario; }
-    public void setIdUsuario(String idUsuario) { this.idUsuario = idUsuario; }
+    public String getIdUsuario() {
+        return idUsuario;
+    }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setIdUsuario(String idUsuario) {
+        this.idUsuario = idUsuario;
+    }
 
-    public String getCorreo() { return correo; }
-    public void setCorreo(String correo) { this.correo = correo; }
+    public String getNombre() {
+        return nombre;
+    }
 
-    public String getContrasena() { return contrasena; }
-    public void setContrasena(String contrasena) { this.contrasena = contrasena; }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-    public String getTelefono() { return telefono; }
-    public void setTelefono(String telefono) { this.telefono = telefono; }
+    public String getCorreo() {
+        return correo;
+    }
 
-    public String getRol() { return rol; }
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
+    public String getContrasena() {
+        return contrasena;
+    }
+
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public String getRol() {
+        return rol;
+    }
+
     public void setRol(String rol) {
-        // 💡 CRÍTICO: Aseguramos que el rol siempre se guarde en MAYÚSCULAS para consistencia con la BD
         this.rol = rol != null ? rol.toUpperCase() : "CLIENTE";
     }
 
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; this.activo = "Activo".equalsIgnoreCase(estado); }
+    public String getEstado() {
+        return estado;
+    }
 
-    public boolean isActivo() { return activo; }
-    public void setActivo(boolean activo) { this.activo = activo; this.estado = activo ? "Activo" : "Inactivo"; }
+    public void setEstado(String estado) {
+        this.estado = estado;
+        this.activo = "Activo".equalsIgnoreCase(estado);
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+        this.estado = activo ? "Activo" : "Inactivo";
+    }
 }

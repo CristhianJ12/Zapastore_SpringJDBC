@@ -15,11 +15,9 @@ import java.util.stream.Collectors;
 @Controller
 public class PerfilController {
 
-    private final UsuarioService usuarioService;
     private final PedidoService pedidoService;
 
     public PerfilController(UsuarioService usuarioService, PedidoService pedidoService) {
-        this.usuarioService = usuarioService;
         this.pedidoService = pedidoService;
     }
 

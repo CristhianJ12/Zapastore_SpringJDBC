@@ -1,8 +1,5 @@
-package com.zapastore.zapastore_h2.controller;
+package com.zapastore.zapastore_h2.model.detalle_pedido;
 
-import com.zapastore.zapastore_h2.model.detalle_pedido.DetallePedido;
-import com.zapastore.zapastore_h2.model.detalle_pedido.DetallePedidoService;
-import com.zapastore.zapastore_h2.model.detalle_pedido.ItemCarrito;
 import com.zapastore.zapastore_h2.model.pedidos.Pedido;
 import com.zapastore.zapastore_h2.model.pedidos.PedidoService;
 import com.zapastore.zapastore_h2.model.producto.Producto;
