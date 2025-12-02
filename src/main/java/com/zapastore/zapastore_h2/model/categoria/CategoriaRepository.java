@@ -30,15 +30,14 @@ public class CategoriaRepository implements CategoriaDAO {
 
     @Override
     public List<Categoria> listarCategoriasActivas() {
-        String sql = "SELECT * FROM categorias WHERE estado='Activo' ORDER BY nombre ASC";
+        String sql = "SELECT * FROM categorias WHERE estado = 'Activo' ORDER BY nombre ASC";
         return jdbcTemplate.query(sql, categoriaMapper);
     }
 
     @Override
     public Categoria buscarPorId(Integer id) {
-        String sql = "SELECT * FROM categorias WHERE categoria_ID=?";
+        String sql = "SELECT * FROM categorias WHERE categoria_ID = ?";
         List<Categoria> lista = jdbcTemplate.query(sql, categoriaMapper, id);
-
         return lista.isEmpty() ? null : lista.get(0);
     }
 
@@ -50,7 +49,7 @@ public class CategoriaRepository implements CategoriaDAO {
 
     @Override
     public void actualizar(Categoria categoria) {
-        String sql = "UPDATE categorias SET nombre=?, estado=? WHERE categoria_ID=?";
+        String sql = "UPDATE categorias SET nombre = ?, estado = ? WHERE categoria_ID = ?";
         jdbcTemplate.update(sql,
                 categoria.getNombre(),
                 categoria.getEstado(),
@@ -59,7 +58,7 @@ public class CategoriaRepository implements CategoriaDAO {
 
     @Override
     public void eliminar(Integer id) {
-        String sql = "DELETE FROM categorias WHERE categoria_ID=?";
+        String sql = "DELETE FROM categorias WHERE categoria_ID = ?";
         jdbcTemplate.update(sql, id);
     }
 }

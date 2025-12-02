@@ -4,9 +4,10 @@ public class Categoria {
 
     private Integer id;
     private String nombre;
-    private String estado; // Activo / Inactivo
+    private String estado; // "Activo" / "Inactivo"
 
-    public Categoria() {}
+    public Categoria() {
+    }
 
     public Categoria(Integer id, String nombre, String estado) {
         this.id = id;

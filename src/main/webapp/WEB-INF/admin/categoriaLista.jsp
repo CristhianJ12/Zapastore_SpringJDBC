@@ -1,28 +1,29 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <c:set var="page" value="categorias" />
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ZapaStore | Administrar Categorías</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link rel="stylesheet" href="<c:url value='/css/admin.css'/>" />
 </head>
 
 <body class="admin-body">
 <div class="admin-layout">
 
-    <jsp:include page="/WEB-INF/fragments/sidebar.jsp"/>
+    <jsp:include page="/WEB-INF/fragments/sidebar.jsp" />
 
     <main class="main-panel">
 
-        <jsp:include page="/WEB-INF/fragments/header.jsp"/>
+        <jsp:include page="/WEB-INF/fragments/header.jsp" />
 
         <div class="content-wrapper">
 
@@ -41,11 +42,7 @@
 
             <section class="crud-area">
 
-                <!-- FORMULARIO PARA AGREGAR CATEGORÍA -->
-                <form class="crud-form"
-                      action="${pageContext.request.contextPath}/admin/categorias/guardar"
-                      method="POST">
-
+                <form class="crud-form" action="<c:url value='/admin/categorias/guardar'/>" method="POST">
                     <div class="form-grid">
 
                         <div class="campo">
@@ -55,7 +52,7 @@
                                    name="nombre"
                                    placeholder="Ej. Deportivos"
                                    required
-                                   class="input-text">
+                                   class="input-text" />
                         </div>
 
                         <div class="campo">
@@ -75,47 +72,48 @@
                     </div>
                 </form>
 
-                <!-- TABLA DE CATEGORÍAS -->
                 <div class="crud-lista">
-                    <table class="crud-table">
+                    <table class="crud-table" role="table" aria-label="Lista de categorías">
                         <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre de la Categoría</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Nombre de la Categoría</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
                         </thead>
 
                         <tbody>
 
                         <c:forEach var="cat" items="${categorias}">
+                            <c:set var="chipClass" value="${cat.estado == 'Activo' ? 'chip-activo' : 'chip-inactivo'}" />
                             <tr>
                                 <td><c:out value="${cat.id}" /></td>
                                 <td><c:out value="${cat.nombre}" /></td>
 
                                 <td>
-                                    <span class="chip 
-                                        <c:out value='${cat.estado == "Activo" ? "chip-activo" : "chip-inactivo"}' />">
+                                    <span class="chip ${chipClass}">
                                         <c:out value="${cat.estado}" />
                                     </span>
                                 </td>
 
                                 <td class="actions-cell">
 
-                                    <!-- BOTÓN EDITAR -->
-                                    <a href="${pageContext.request.contextPath}/admin/categorias/mostrarEditar?id=${cat.id}"
+                                    <a href="<c:url value='/admin/categorias/mostrarEditar'>
+                                                    <c:param name='id' value='${cat.id}'/>
+                                                </c:url>"
                                        class="icon-button edit"
                                        title="Editar categoría">
                                         <span class="material-symbols-outlined">edit</span>
                                     </a>
 
-                                    <!-- BOTÓN DESACTIVAR -->
                                     <c:if test="${cat.estado == 'Activo'}">
-                                        <a href="${pageContext.request.contextPath}/admin/categorias/eliminar?id=${cat.id}"
+                                        <a href="<c:url value='/admin/categorias/eliminar'>
+                                                        <c:param name='id' value='${cat.id}'/>
+                                                   </c:url>"
                                            class="icon-button delete"
                                            title="Inactivar categoría"
-                                           onclick="return confirm('¿Está seguro de desactivar la categoría &quot;${cat.nombre}&quot;?');">
+                                           onclick="return confirm('¿Está seguro de desactivar la categoría &quot;${fn:escapeXml(cat.nombre)}&quot;?');">
                                             <span class="material-symbols-outlined">delete</span>
                                         </a>
                                     </c:if>
@@ -123,7 +121,6 @@
                             </tr>
                         </c:forEach>
 
-                        <!-- MENSAJE SI NO HAY CATEGORÍAS -->
                         <c:if test="${empty categorias}">
                             <tr>
                                 <td colspan="4" class="tabla-vacia">
