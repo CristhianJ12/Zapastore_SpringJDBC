@@ -17,18 +17,12 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public Optional<Usuario> login(String correo, String contrasena) {
         Optional<Usuario> usuarioOpt = usuarioDAO.findByCorreo(correo);
-        if (usuarioOpt.isEmpty()) {
-            return Optional.empty();
-        }
+        if (usuarioOpt.isEmpty()) return Optional.empty();
 
         Usuario usuario = usuarioOpt.get();
-
-        if (usuario.getContrasena() == null) {
-            return Optional.empty();
-        }
+        if (usuario.getContrasena() == null) return Optional.empty();
 
         boolean matches = usuario.getContrasena().equals(contrasena);
-
         if (matches && usuario.isActivo()) {
             usuario.setContrasena(null);
             return Optional.of(usuario);
@@ -38,20 +32,11 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public boolean registrarCliente(Usuario usuario, String confirmPassword) {
-        if (usuario.getContrasena() == null || !usuario.getContrasena().equals(confirmPassword)) {
-            return false;
-        }
+        if (usuario.getContrasena() == null || !usuario.getContrasena().equals(confirmPassword)) return false;
+        if (usuarioDAO.existsByCorreo(usuario.getCorreo())) return false;
 
-        if (usuarioDAO.existsByCorreo(usuario.getCorreo())) {
-            return false;
-        }
-
-        if (usuario.getRol() == null || usuario.getRol().isEmpty()) {
-            usuario.setRol("cliente");
-        }
-        if (usuario.getEstado() == null || usuario.getEstado().isEmpty()) {
-            usuario.setEstado("Activo");
-        }
+        if (usuario.getRol() == null || usuario.getRol().isEmpty()) usuario.setRol("CLIENTE");
+        if (usuario.getEstado() == null || usuario.getEstado().isEmpty()) usuario.setEstado("Activo");
 
         return usuarioDAO.save(usuario);
     }
@@ -73,34 +58,18 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public boolean guardarUsuario(Usuario usuario) {
-        if (usuarioDAO.existsByCorreo(usuario.getCorreo())) {
-            return false;
-        }
+        if (usuarioDAO.existsByCorreo(usuario.getCorreo())) return false;
 
-        if (usuario.getContrasena() == null || usuario.getContrasena().isEmpty()) {
-            usuario.setContrasena(usuario.getContrasena());
-        }
-
-        if (usuario.getRol() == null || usuario.getRol().isEmpty()) {
-            usuario.setRol("cliente");
-        }
-        if (usuario.getEstado() == null || usuario.getEstado().isEmpty()) {
-            usuario.setEstado("Activo");
-        }
+        if (usuario.getRol() == null || usuario.getRol().isEmpty()) usuario.setRol("CLIENTE");
+        if (usuario.getEstado() == null || usuario.getEstado().isEmpty()) usuario.setEstado("Activo");
 
         return usuarioDAO.save(usuario);
     }
 
     @Override
     public boolean actualizarUsuario(Usuario usuario) {
-        if (usuarioDAO.buscarPorId(usuario.getIdUsuario()).isEmpty()) {
-            return false;
-        }
-
-        if (usuario.getContrasena() != null && usuario.getContrasena().isEmpty()) {
-            usuario.setContrasena(null);
-        }
-
+        if (usuarioDAO.buscarPorId(usuario.getIdUsuario()).isEmpty()) return false;
+        if (usuario.getContrasena() != null && usuario.getContrasena().isEmpty()) usuario.setContrasena(null);
         return usuarioDAO.actualizar(usuario);
     }
 

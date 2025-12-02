@@ -25,8 +25,8 @@ public class UsuarioRepository implements UsuarioDAO {
         usuario.setCorreo(rs.getString("correo"));
         usuario.setContrasena(rs.getString("contrasena"));
         usuario.setTelefono(rs.getString("telefono"));
-        usuario.setRol(rs.getString("Rol").toUpperCase());
-        usuario.setEstado(rs.getString("estado"));
+        usuario.setRol(rs.getString("Rol") != null ? rs.getString("Rol").toUpperCase() : "CLIENTE");
+        usuario.setEstado(rs.getString("estado") != null ? rs.getString("estado") : "Activo");
         return usuario;
     };
 
@@ -43,7 +43,7 @@ public class UsuarioRepository implements UsuarioDAO {
 
     @Override
     public boolean existsByCorreo(String correo) {
-        String sql = "SELECT count(*) FROM usuarios WHERE correo = ?";
+        String sql = "SELECT COUNT(*) FROM usuarios WHERE correo = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, correo);
         return count != null && count > 0;
     }
@@ -67,21 +67,21 @@ public class UsuarioRepository implements UsuarioDAO {
 
     @Override
     public boolean save(Usuario usuario) {
-        String sql = "INSERT INTO usuarios (IDUsuario, nombre, correo, contrasena, telefono, Rol, estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
         if (usuario.getIdUsuario() == null || usuario.getIdUsuario().isEmpty()) {
             usuario.setIdUsuario(UUID.randomUUID().toString());
         }
 
-        if (usuario.getRol() == null || usuario.getRol().isEmpty() || "cliente".equalsIgnoreCase(usuario.getRol())) {
+        if (usuario.getRol() == null || usuario.getRol().isEmpty()) {
             usuario.setRol("CLIENTE");
-        } else if ("admin".equalsIgnoreCase(usuario.getRol())) {
-            usuario.setRol("ADMIN");
+        } else {
+            usuario.setRol(usuario.getRol().toUpperCase());
         }
 
         if (usuario.getEstado() == null || usuario.getEstado().isEmpty()) {
             usuario.setEstado("Activo");
         }
+
+        String sql = "INSERT INTO usuarios (IDUsuario, nombre, correo, contrasena, telefono, Rol, estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         int rows = jdbcTemplate.update(sql,
                 usuario.getIdUsuario(),
