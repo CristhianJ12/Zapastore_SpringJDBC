@@ -30,8 +30,13 @@ public class CatalogoController {
         List<Categoria> categorias = categoriaService.listarCategoriasActivas();
         model.addAttribute("categorias", categorias);
 
-        // Obtener productos filtrados por categoría o todos
-        List<Producto> productos = productoService.buscarPorCategoria(categoriaId);
+        // CAMBIO: Obtener solo productos activos filtrados por categoría o todos
+        List<Producto> productos;
+        if (categoriaId != null) {
+            productos = productoService.buscarPorCategoriaActivos(categoriaId);
+        } else {
+            productos = productoService.listarProductosActivos();
+        }
 
         // Asignar nombre de categoría a cada producto (opcional, si no viene del join)
         productos.forEach(p -> {

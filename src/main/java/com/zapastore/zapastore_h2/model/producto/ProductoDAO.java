@@ -5,11 +5,18 @@ import java.util.List;
 public interface ProductoDAO {
 
     List<Producto> listarProductos();
+    List<Producto> listarProductosActivos();
+    List<Producto> listarProductosInactivos();  // ← NUEVO
+
     List<Producto> buscarPorNombre(String nombre);
     Producto buscarPorId(int id);
     void guardar(Producto producto);
     void actualizar(Producto producto);
     void desactivar(int id);
     boolean existeNombre(String nombre, Integer excluirId);
+
     List<Producto> buscarPorCategoria(Integer categoriaId);
+    List<Producto> buscarPorCategoriaActivos(Integer categoriaId);
+
+    void activar(int id);
 }

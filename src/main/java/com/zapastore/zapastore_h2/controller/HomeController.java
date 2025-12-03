@@ -24,7 +24,8 @@ public class HomeController {
     @GetMapping({"/", "/home"})
     public String home(Model model) {
 
-        List<Producto> productos = productoService.listarProductos();
+        // CAMBIO: Usar solo productos activos
+        List<Producto> productos = productoService.listarProductosActivos();
 
         // Agrupar productos por categoriaID y tomar el último de cada categoría
         Map<Integer, Producto> ultimoProductoPorCategoria = productos.stream()

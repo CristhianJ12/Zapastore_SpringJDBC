@@ -19,6 +19,16 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
+    public List<Producto> listarProductosActivos() {
+        return productoDAO.listarProductosActivos();
+    }
+
+    @Override
+    public List<Producto> listarProductosInactivos() {
+        return productoDAO.listarProductosInactivos();
+    }
+
+    @Override
     public Producto buscarPorId(int id) {
         return productoDAO.buscarPorId(id);
     }
@@ -57,15 +67,22 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
+    public List<Producto> buscarPorCategoria(Integer categoriaId) {
+        return categoriaId == null ? productoDAO.listarProductos() : productoDAO.buscarPorCategoria(categoriaId);
+    }
+
+    @Override
+    public List<Producto> buscarPorCategoriaActivos(Integer categoriaId) {
+        return categoriaId == null ? productoDAO.listarProductosActivos() : productoDAO.buscarPorCategoriaActivos(categoriaId);
+    }
+
+    @Override
     public boolean existeNombre(String nombre, Integer excluirId) {
         return productoDAO.existeNombre(nombre, excluirId);
     }
 
     @Override
-    public List<Producto> buscarPorCategoria(Integer categoriaId) {
-        if (categoriaId == null) {
-            return productoDAO.listarProductos();
-        }
-        return productoDAO.buscarPorCategoria(categoriaId);
+    public void activarProducto(int id) {
+        productoDAO.activar(id);
     }
 }

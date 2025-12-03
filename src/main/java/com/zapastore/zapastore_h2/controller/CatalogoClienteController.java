@@ -31,12 +31,12 @@ public class CatalogoClienteController {
         List<Categoria> categorias = categoriaService.listarCategoriasActivas();
         model.addAttribute("categorias", categorias);
 
-        // Obtener productos filtrados por categoría o todos
+        // CAMBIO: Obtener solo productos activos filtrados por categoría o todos
         List<Producto> productos;
         if (categoriaId != null) {
-            productos = productoService.buscarPorCategoria(categoriaId);
+            productos = productoService.buscarPorCategoriaActivos(categoriaId);
         } else {
-            productos = productoService.listarProductos();
+            productos = productoService.listarProductosActivos();
         }
 
         // Asignar nombre de categoría a cada producto
@@ -57,12 +57,14 @@ public class CatalogoClienteController {
     public String verProducto(@PathVariable Integer id, Model model) {
         // Buscar el producto por ID
         Producto producto = productoService.buscarPorId(id);
-        if (producto == null) {
-            throw new IllegalArgumentException("Producto no encontrado con ID: " + id);
+
+        // CAMBIO: Si el producto no existe o está inactivo, redirigir al catálogo
+        if (producto == null || "Inactivo".equalsIgnoreCase(producto.getEstado())) {
+            return "redirect:/cliente/catalogo";
         }
 
         // Obtener el nombre de la categoría
-        Categoria cat = categoriaService.buscarPorId(producto.getId());
+        Categoria cat = categoriaService.buscarPorId(producto.getCategoriaID());
         if (cat != null) {
             producto.setCategoriaNombre(cat.getNombre());
         }

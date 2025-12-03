@@ -29,6 +29,22 @@
         <section class="container cart-layout section-padding">
             <h1 class="section-title">Mi Carrito de Compras</h1>
 
+            <!-- MENSAJES DE ERROR Y ÉXITO -->
+            <c:if test="${not empty error}">
+            <div class="alert-mensaje alert-error">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>${error}</span>
+            </div>
+            </c:if>
+
+
+            <c:if test="${not empty mensaje}">
+                <div class="alert-mensaje alert-success">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>${mensaje}</span>
+                </div>
+            </c:if>
+
             <c:choose>
                 <c:when test="${empty carrito}">
                     <div class="empty-cart">
@@ -40,11 +56,12 @@
                 </c:when>
 
                 <c:otherwise>
+
                     <div class="cart-content-grid">
 
                         <div class="cart-product-list">
                             <c:forEach var="item" items="${carrito}">
-                                <article class="cart-item">
+                                <article class="cart-item ${item.productoInactivo ? 'producto-inactivo' : ''}">
 
                                     <img src="<c:out value='${item.producto.imagenUrl}'/>"
                                          alt="<c:out value='${item.producto.nombre}'/>"
@@ -54,6 +71,9 @@
                                     <div class="cart-item-info">
                                         <h2 class="cart-item-title">
                                             <c:out value="${item.producto.nombre}"/>
+                                            <c:if test="${item.productoInactivo}">
+                                                <span class="badge-descontinuado">Descontinuado</span>
+                                            </c:if>
                                         </h2>
 
                                         <p class="cart-item-category">
@@ -63,9 +83,15 @@
                                         <p class="cart-item-price">
                                             S/ <fmt:formatNumber value="${item.precioUnitario}" minFractionDigits="2"/>
                                         </p>
+
+                                        <c:if test="${item.productoInactivo}">
+                                            <p class="producto-no-disponible-msg">
+                                                <i class="fa-solid fa-ban"></i> Este producto ya no está disponible
+                                            </p>
+                                        </c:if>
                                     </div>
 
-                                    <div class="cart-item-quantity">
+                                    <div class="cart-item-quantity ${item.productoInactivo ? 'producto-inactivo' : ''}">
                                         <form action="${ctx}/cliente/carrito/actualizar" method="post">
                                             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                             <input type="hidden" name="detalleId" value="${item.detalleId}"/>
@@ -79,6 +105,7 @@
                                                    max="99"
                                                    class="quantity-input"
                                                    required
+                                                ${item.productoInactivo ? 'disabled' : ''}
                                                    aria-label="Cantidad del producto <c:out value='${item.producto.nombre}'/>"/>
 
                                             <label for="talla-${item.detalleId}">Talla:</label>
@@ -86,6 +113,7 @@
                                                     name="talla"
                                                     class="size-input"
                                                     required
+                                                ${item.productoInactivo ? 'disabled' : ''}
                                                     aria-label="Seleccionar talla para <c:out value='${item.producto.nombre}'/>">
                                                 <c:forEach var="t" begin="35" end="45">
                                                     <option value="${t}" ${t == item.talla ? 'selected' : ''}>
@@ -94,7 +122,10 @@
                                                 </c:forEach>
                                             </select>
 
-                                            <button type="submit" class="update-button" aria-label="Actualizar producto">
+                                            <button type="submit"
+                                                    class="update-button"
+                                                ${item.productoInactivo ? 'disabled' : ''}
+                                                    aria-label="Actualizar producto">
                                                 <i class="fa-solid fa-rotate" aria-hidden="true"></i> Actualizar
                                             </button>
                                         </form>
@@ -148,10 +179,18 @@
 
                             <form action="${ctx}/cliente/checkout" method="post">
                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                                <button type="submit" class="primary-button checkout-button">
+                                <button type="submit"
+                                        class="primary-button checkout-button"
+                                    ${hayProductosInactivos ? 'disabled' : ''}>
                                     <i class="fa-solid fa-lock" aria-hidden="true"></i> Proceder al Pago
                                 </button>
                             </form>
+
+                            <c:if test="${hayProductosInactivos}">
+                                <p class="info-eliminar-descontinuados">
+                                    <i class="fa-solid fa-info-circle"></i> Elimina los productos descontinuados para continuar
+                                </p>
+                            </c:if>
 
                             <a href="${ctx}/cliente/catalogo" class="secondary-link">
                                 <i class="fa-solid fa-reply" aria-hidden="true"></i> Seguir comprando

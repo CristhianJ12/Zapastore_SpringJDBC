@@ -52,6 +52,35 @@ public class ProductoRepository implements ProductoDAO {
     }
 
     @Override
+    public List<Producto> listarProductosActivos() {
+        String sql = """
+            SELECT p.producto_ID, p.nombre, p.Precio, p.img_Url,
+                   p.descripcion, p.estado, p.categoria_ID,
+                   c.nombre AS categoria_nombre
+            FROM productos p
+            LEFT JOIN categorias c ON p.categoria_ID = c.categoria_ID
+            WHERE p.estado = 'Activo'
+            ORDER BY p.producto_ID ASC
+        """;
+        return jdbcTemplate.query(sql, mapper);
+    }
+
+    @Override
+    public List<Producto> listarProductosInactivos() {
+        String sql = """
+        SELECT p.producto_ID, p.nombre, p.Precio, p.img_Url,
+               p.descripcion, p.estado, p.categoria_ID,
+               c.nombre AS categoria_nombre
+        FROM productos p
+        LEFT JOIN categorias c ON p.categoria_ID = c.categoria_ID
+        WHERE p.estado = 'Inactivo'
+        ORDER BY p.producto_ID ASC
+    """;
+        return jdbcTemplate.query(sql, mapper);
+    }
+
+
+    @Override
     public List<Producto> buscarPorNombre(String nombre) {
         String sql = """
             SELECT p.producto_ID, p.nombre, p.Precio, p.img_Url,
@@ -99,16 +128,18 @@ public class ProductoRepository implements ProductoDAO {
     @Override
     public void actualizar(Producto p) {
         String sql = """
-            UPDATE productos SET nombre=?, Precio=?, img_Url=?, 
-                descripcion=?, categoria_ID=? 
-            WHERE producto_ID=?
-        """;
+        UPDATE productos 
+        SET nombre=?, Precio=?, img_Url=?, descripcion=?, categoria_ID=?, estado=?
+        WHERE producto_ID=?
+    """;
+
         jdbcTemplate.update(sql,
                 p.getNombre(),
                 p.getPrecio(),
                 p.getImagenUrl(),
                 p.getDescripcion(),
                 p.getCategoriaID(),
+                p.getEstado(),
                 p.getId()
         );
     }
@@ -142,4 +173,24 @@ public class ProductoRepository implements ProductoDAO {
         """;
         return jdbcTemplate.query(sql, mapper, categoriaId);
     }
+
+    @Override
+    public List<Producto> buscarPorCategoriaActivos(Integer categoriaId) {
+        String sql = """
+            SELECT p.producto_ID, p.nombre, p.Precio, p.img_Url,
+                   p.descripcion, p.estado, p.categoria_ID,
+                   c.nombre AS categoria_nombre
+            FROM productos p
+            LEFT JOIN categorias c ON p.categoria_ID = c.categoria_ID
+            WHERE p.categoria_ID = ? AND p.estado = 'Activo'
+            ORDER BY p.producto_ID ASC
+        """;
+        return jdbcTemplate.query(sql, mapper, categoriaId);
+    }
+
+    @Override
+    public void activar(int id) {
+        jdbcTemplate.update("UPDATE productos SET estado='Activo' WHERE producto_ID=?", id);
+    }
+
 }

@@ -4,6 +4,7 @@ import com.zapastore.zapastore_h2.model.categoria.CategoriaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @Controller
@@ -18,18 +19,29 @@ public class ProductoController {
         this.categoriaService = categoriaService;
     }
 
-    @GetMapping({ "", "/lista" })
-    public String listarProductos(@RequestParam(value = "q", required = false) String query, Model model) {
-        List<Producto> productos =
-                (query != null && !query.isEmpty())
-                        ? productoService.buscarPorNombre(query)
-                        : productoService.listarProductos();
+    @GetMapping({"", "/lista"})
+    public String listarProductos(
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "showInactive", required = false, defaultValue = "false") boolean showInactive,
+            Model model
+    ) {
+        List<Producto> productos;
+
+        if (q != null && !q.trim().isEmpty()) {
+            productos = productoService.buscarPorNombre(q);
+            model.addAttribute("currentQuery", q);
+        } else {
+            productos = showInactive
+                    ? productoService.listarProductosInactivos()
+                    : productoService.listarProductosActivos();
+        }
 
         model.addAttribute("productos", productos);
-        model.addAttribute("currentQuery", query);
+        model.addAttribute("showInactive", showInactive);
 
-        return "admin/productoLista";
+        return "admin/productoLista";  // ← RUTA CORRECTA DEL JSP
     }
+
 
     @GetMapping("/crear")
     public String mostrarFormularioNuevo(Model model) {
@@ -53,11 +65,10 @@ public class ProductoController {
 
         try {
             if (esEdicion) {
-                productoService.actualizarProducto(producto);
-                model.addAttribute("mensaje", "Producto actualizado correctamente.");
+                productoService.actualizarProducto(producto); // <-- ya recibe estado
             } else {
+                producto.setEstado("Activo"); // siempre activo al crear
                 productoService.guardarProducto(producto);
-                model.addAttribute("mensaje", "Producto registrado exitosamente.");
             }
             return "redirect:/admin/productos/lista";
         } catch (IllegalArgumentException e) {
@@ -71,5 +82,11 @@ public class ProductoController {
     public String desactivarProducto(@PathVariable int id) {
         productoService.desactivarProducto(id);
         return "redirect:/admin/productos/lista";
+    }
+
+    @GetMapping("/activar/{id}")
+    public String activarProducto(@PathVariable int id) {
+        productoService.activarProducto(id);
+        return "redirect:/admin/productos/lista?showInactive=true";
     }
 }

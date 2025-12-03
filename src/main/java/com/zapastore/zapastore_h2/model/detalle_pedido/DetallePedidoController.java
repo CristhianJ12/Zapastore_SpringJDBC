@@ -51,6 +51,7 @@ public class DetallePedidoController {
         List<Pedido> pendientes = pedidoService.findByClienteAndEstado(cliente, "Pendiente");
         List<ItemCarrito> carrito = new ArrayList<>();
         BigDecimal totalPagar = BigDecimal.ZERO;
+        boolean hayProductosInactivos = false;
 
         if (!pendientes.isEmpty()) {
             Pedido pedidoPendiente = pendientes.get(0);
@@ -73,6 +74,13 @@ public class DetallePedidoController {
                         detalle.getTalla()
                 );
                 item.setDetalleId(detalle.getId());
+
+                // VALIDACIÓN: Verificar si el producto está inactivo
+                if ("Inactivo".equalsIgnoreCase(producto.getEstado())) {
+                    item.setProductoInactivo(true);
+                    hayProductosInactivos = true;
+                }
+
                 carrito.add(item);
             }
 
@@ -86,6 +94,7 @@ public class DetallePedidoController {
         model.addAttribute("carrito", carrito);
         model.addAttribute("totalItems", totalItems);
         model.addAttribute("totalPagar", totalPagar);
+        model.addAttribute("hayProductosInactivos", hayProductosInactivos);
 
         return "cliente/carrito";
     }
@@ -106,6 +115,12 @@ public class DetallePedidoController {
         if (producto == null) {
             ra.addFlashAttribute("error", "Producto no encontrado.");
             return "redirect:/cliente/home";
+        }
+
+        // VALIDACIÓN: No permitir agregar productos inactivos
+        if ("Inactivo".equalsIgnoreCase(producto.getEstado())) {
+            ra.addFlashAttribute("error", "Este producto ha sido descontinuado y ya no está disponible.");
+            return "redirect:/cliente/catalogo";
         }
 
         Pedido pedidoPendiente;
@@ -159,6 +174,13 @@ public class DetallePedidoController {
         DetallePedido detalleActual = detalleService.buscarPorId(detalleId);
         if (detalleActual == null) {
             ra.addFlashAttribute("error", "Detalle de producto no encontrado.");
+            return "redirect:/cliente/carrito";
+        }
+
+        // VALIDACIÓN CRÍTICA: Verificar si el producto está inactivo
+        Producto producto = productoService.buscarPorId(detalleActual.getProductoId());
+        if (producto == null || "Inactivo".equalsIgnoreCase(producto.getEstado())) {
+            ra.addFlashAttribute("error", "⚠️ Este producto ha sido descontinuado. Debes eliminarlo del carrito para continuar con tu compra.");
             return "redirect:/cliente/carrito";
         }
 

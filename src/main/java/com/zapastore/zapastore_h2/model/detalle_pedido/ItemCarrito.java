@@ -12,6 +12,7 @@ public class ItemCarrito {
     private Integer talla;
     private BigDecimal precioUnitario;
     private BigDecimal subtotal;
+    private boolean productoInactivo; // NUEVO CAMPO
 
     public ItemCarrito() {}
 
@@ -21,6 +22,7 @@ public class ItemCarrito {
         this.cantidad = cantidad;
         this.talla = talla;
         this.precioUnitario = producto.getPrecio();
+        this.productoInactivo = false; // Por defecto activo
         calcularSubtotal();
     }
 
@@ -30,6 +32,7 @@ public class ItemCarrito {
         }
     }
 
+    // Getters y Setters existentes
     public Integer getId() {
         return id;
     }
@@ -86,5 +89,14 @@ public class ItemCarrito {
 
     public void setSubtotal(BigDecimal subtotal) {
         this.subtotal = subtotal;
+    }
+
+    // NUEVO: Getter y Setter para productoInactivo
+    public boolean isProductoInactivo() {
+        return productoInactivo;
+    }
+
+    public void setProductoInactivo(boolean productoInactivo) {
+        this.productoInactivo = productoInactivo;
     }
 }
