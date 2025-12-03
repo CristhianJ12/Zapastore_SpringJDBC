@@ -25,10 +25,18 @@ public class ClienteController {
     @GetMapping("/cliente/home")
     public String home(Model model) {
 
-        // CAMBIO: Usar solo productos activos
-        List<Producto> productos = productoService.listarProductosActivos();
+        // *** NUEVO: Filtrar categorías activas ***
+        List<Categoria> categoriasActivas = categoriaService.listarCategoriasActivas();
+        Set<Integer> idsCategoriasActivas = categoriasActivas.stream()
+                .map(Categoria::getId)
+                .collect(Collectors.toSet());
 
-        // Agrupar productos por categoriaID y tomar el último de cada categoría
+        // Solo productos activos con categoría activa
+        List<Producto> productos = productoService.listarProductosActivos().stream()
+                .filter(p -> idsCategoriasActivas.contains(p.getCategoriaID()))
+                .collect(Collectors.toList());
+
+        // Agrupar productos por categoria
         Map<Integer, Producto> ultimoProductoPorCategoria = productos.stream()
                 .filter(p -> p.getCategoriaID() != null)
                 .collect(Collectors.toMap(
@@ -37,7 +45,7 @@ public class ClienteController {
                         (p1, p2) -> p2
                 ));
 
-        // Asignar nombre de categoría a cada producto
+        // Asignar nombre de la categoría
         ultimoProductoPorCategoria.values().forEach(p -> {
             Categoria categoria = categoriaService.buscarPorId(p.getCategoriaID());
             if (categoria != null) {
@@ -45,7 +53,8 @@ public class ClienteController {
             }
         });
 
-        model.addAttribute("productosDestacados", new ArrayList<>(ultimoProductoPorCategoria.values()));
+        model.addAttribute("productosDestacados",
+                new ArrayList<>(ultimoProductoPorCategoria.values()));
 
         return "cliente/homecliente";
     }

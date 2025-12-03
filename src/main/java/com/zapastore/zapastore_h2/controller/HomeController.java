@@ -1,5 +1,6 @@
 package com.zapastore.zapastore_h2.controller;
 
+import com.zapastore.zapastore_h2.model.categoria.Categoria;
 import com.zapastore.zapastore_h2.model.categoria.CategoriaService;
 import com.zapastore.zapastore_h2.model.producto.Producto;
 import com.zapastore.zapastore_h2.model.producto.ProductoService;
@@ -24,19 +25,27 @@ public class HomeController {
     @GetMapping({"/", "/home"})
     public String home(Model model) {
 
-        // CAMBIO: Usar solo productos activos
-        List<Producto> productos = productoService.listarProductosActivos();
+        // *** NUEVO: Filtrar categorías activas ***
+        List<Categoria> categoriasActivas = categoriaService.listarCategoriasActivas();
+        Set<Integer> idsCategoriasActivas = categoriasActivas.stream()
+                .map(Categoria::getId)
+                .collect(Collectors.toSet());
+
+        // Usar solo productos activos que pertenezcan a categorías activas
+        List<Producto> productos = productoService.listarProductosActivos().stream()
+                .filter(p -> idsCategoriasActivas.contains(p.getCategoriaID()))
+                .collect(Collectors.toList());
 
         // Agrupar productos por categoriaID y tomar el último de cada categoría
         Map<Integer, Producto> ultimoProductoPorCategoria = productos.stream()
                 .filter(p -> p.getCategoriaID() != null)
                 .collect(Collectors.toMap(
-                        Producto::getCategoriaID,   // Clave = categoriaID
-                        p -> p,                     // Valor = el producto
-                        (p1, p2) -> p2              // En caso de duplicado, tomar el último
+                        Producto::getCategoriaID,
+                        p -> p,
+                        (p1, p2) -> p2
                 ));
 
-        // Asignar nombre de categoría a cada producto
+        // Asignar nombre de categoría
         ultimoProductoPorCategoria.values().forEach(p -> {
             var categoria = categoriaService.buscarPorId(p.getCategoriaID());
             if (categoria != null) {
@@ -44,8 +53,8 @@ public class HomeController {
             }
         });
 
-        // Pasar la lista al modelo
-        model.addAttribute("productosDestacados", new ArrayList<>(ultimoProductoPorCategoria.values()));
+        model.addAttribute("productosDestacados",
+                new ArrayList<>(ultimoProductoPorCategoria.values()));
 
         return "home";
     }

@@ -26,19 +26,26 @@ public class CatalogoController {
     public String catalogo(@RequestParam(value = "categoriaId", required = false) Integer categoriaId,
                            Model model) {
 
-        // Obtener todas las categorías para el select
+        // Obtener solo categorías ACTIVAS
         List<Categoria> categorias = categoriaService.listarCategoriasActivas();
         model.addAttribute("categorias", categorias);
 
-        // CAMBIO: Obtener solo productos activos filtrados por categoría o todos
+        // Obtener productos activos según categoría
         List<Producto> productos;
+
         if (categoriaId != null) {
             productos = productoService.buscarPorCategoriaActivos(categoriaId);
         } else {
             productos = productoService.listarProductosActivos();
         }
 
-        // Asignar nombre de categoría a cada producto (opcional, si no viene del join)
+        // FILTRO EXTRA: eliminar productos cuya categoría está inactiva
+        productos.removeIf(p -> {
+            Categoria cat = categoriaService.buscarPorId(p.getCategoriaID());
+            return cat == null || !"Activo".equalsIgnoreCase(cat.getEstado());
+        });
+
+        // Asignar nombre de categoría
         productos.forEach(p -> {
             Categoria cat = categoriaService.buscarPorId(p.getCategoriaID());
             if (cat != null) {

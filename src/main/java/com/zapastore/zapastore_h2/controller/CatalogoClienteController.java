@@ -27,19 +27,25 @@ public class CatalogoClienteController {
     public String catalogo(@RequestParam(value = "categoriaId", required = false) Integer categoriaId,
                            Model model) {
 
-        // Obtener todas las categorías activas para el select
+        // categorías activas
         List<Categoria> categorias = categoriaService.listarCategoriasActivas();
         model.addAttribute("categorias", categorias);
 
-        // CAMBIO: Obtener solo productos activos filtrados por categoría o todos
         List<Producto> productos;
+
         if (categoriaId != null) {
             productos = productoService.buscarPorCategoriaActivos(categoriaId);
         } else {
             productos = productoService.listarProductosActivos();
         }
 
-        // Asignar nombre de categoría a cada producto
+        // FILTRO: ocultar productos con categoría inactiva
+        productos.removeIf(p -> {
+            Categoria cat = categoriaService.buscarPorId(p.getCategoriaID());
+            return cat == null || !"Activo".equalsIgnoreCase(cat.getEstado());
+        });
+
+        // Asignar nombre categoría
         productos.forEach(p -> {
             Categoria cat = categoriaService.buscarPorId(p.getCategoriaID());
             if (cat != null) {
@@ -55,26 +61,26 @@ public class CatalogoClienteController {
 
     @GetMapping("/cliente/producto/{id}")
     public String verProducto(@PathVariable Integer id, Model model) {
-        // Buscar el producto por ID
+
         Producto producto = productoService.buscarPorId(id);
 
-        // CAMBIO: Si el producto no existe o está inactivo, redirigir al catálogo
-        if (producto == null || "Inactivo".equalsIgnoreCase(producto.getEstado())) {
+        // Validación: producto activo y categoría activa
+        if (producto == null || !"Activo".equalsIgnoreCase(producto.getEstado())) {
             return "redirect:/cliente/catalogo";
         }
 
-        // Obtener el nombre de la categoría
         Categoria cat = categoriaService.buscarPorId(producto.getCategoriaID());
-        if (cat != null) {
-            producto.setCategoriaNombre(cat.getNombre());
+
+        if (cat == null || !"Activo".equalsIgnoreCase(cat.getEstado())) {
+            return "redirect:/cliente/catalogo";
         }
 
-        // Lista de tallas disponibles (puede ser fija o dinámica)
+        producto.setCategoriaNombre(cat.getNombre());
+
         List<Integer> tallas = List.of(38, 39, 40, 41, 42);
         producto.setTallas(tallas);
 
         model.addAttribute("producto", producto);
-
         return "cliente/productoDetalle";
     }
 }
