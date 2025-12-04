@@ -1,4 +1,4 @@
-package com.zapastore.zapastore_h2.controller;
+package com.zapastore.zapastore_h2.model.detalle_pedido;
 
 import com.zapastore.zapastore_h2.model.detalle_pedido.ItemCarrito;
 import com.zapastore.zapastore_h2.model.usuarios.Usuario;
